@@ -41,11 +41,11 @@
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
     // Locked to the original playable's vertical phone composition.
-    table.top = h*0.292;
+    table.top = h*0.305;
     table.bottom = h*0.865;
     table.launchY = h*0.775;
-    table.leftBottom = w*.025; table.rightBottom = w*.975;
-    table.leftTop = w*.145; table.rightTop = w*.855;
+    table.leftBottom = w*.035; table.rightBottom = w*.965;
+    table.leftTop = w*.205; table.rightTop = w*.795;
   }
 
   function xBoundsAt(y){
@@ -244,24 +244,31 @@
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
   function drawBenches(){
     const w=state.w,h=state.h;
-    // Small rear-side stools like environment props; keep them behind the main tray.
-    const y=h*.475, bh=h*.125;
+    // Long, narrow rear-side benches: environmental props, aligned with the tray perspective.
     ctx.save();
-    function rearBench(left){
-      const x = left ? -w*.035 : w*.875;
-      const bw = w*.135;
-      const g=ctx.createLinearGradient(0,y,0,y+bh);
-      g.addColorStop(0,'#dfb77b'); g.addColorStop(.62,'#c58f50'); g.addColorStop(1,'#9c6638');
-      ctx.fillStyle=g; ctx.strokeStyle='rgba(128,82,39,.75)'; ctx.lineWidth=2.5;
-      roundRect(x,y,bw,bh,8,true); ctx.stroke();
-      ctx.fillStyle='rgba(255,230,176,.28)'; roundRect(x+bw*.16,y+8,bw*.60,bh-16,5,true);
-      ctx.strokeStyle='rgba(99,63,31,.28)'; ctx.lineWidth=1.5;
-      for(let i=1;i<=2;i++){ const px=x+bw*(.25+i*.20); ctx.beginPath(); ctx.moveTo(px,y+8); ctx.lineTo(px,y+bh-8); ctx.stroke(); }
-      ctx.fillStyle='rgba(116,70,32,.75)';
-      roundRect(x+bw*.24,y+bh-2,9,h*.046,4,true);
-      roundRect(x+bw*.67,y+bh-5,9,h*.042,4,true);
+    function sideBench(left){
+      const y1=h*.435, y2=h*.665;
+      const nearW=w*.105, farW=w*.075;
+      const xNear = left ? w*.025 : w*.975-nearW;
+      const xFar = left ? w*.075 : w*.925-farW;
+      const g=ctx.createLinearGradient(0,y1,0,y2);
+      g.addColorStop(0,'#e7bd82'); g.addColorStop(.55,'#c99353'); g.addColorStop(1,'#9d6435');
+      ctx.fillStyle=g; ctx.strokeStyle='rgba(124,78,36,.72)'; ctx.lineWidth=2.5;
+      ctx.beginPath();
+      ctx.moveTo(xFar,y1); ctx.lineTo(xFar+farW,y1+2); ctx.lineTo(xNear+nearW,y2); ctx.lineTo(xNear,y2-2); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.save(); ctx.clip();
+      ctx.strokeStyle='rgba(255,230,172,.34)'; ctx.lineWidth=2;
+      for(let i=0;i<3;i++){ const t=(i+1)/4; ctx.beginPath(); ctx.moveTo(lerp(xFar,xNear,t)+farW*.22,y1+8); ctx.lineTo(lerp(xFar,xNear,t)+nearW*.22,y2-8); ctx.stroke(); }
+      ctx.strokeStyle='rgba(94,58,27,.25)'; ctx.lineWidth=1.5;
+      for(let i=0;i<4;i++){ const y=lerp(y1+14,y2-14,i/3); ctx.beginPath(); ctx.moveTo(lerp(xFar,xNear,(y-y1)/(y2-y1))+5,y); ctx.lineTo(lerp(xFar+farW,xNear+nearW,(y-y1)/(y2-y1))-5,y+3); ctx.stroke(); }
+      ctx.restore();
+      // Two small legs, tucked behind the tray line.
+      ctx.fillStyle='rgba(112,66,31,.82)';
+      const lx1=left?xNear+nearW*.18:xNear+nearW*.62, lx2=left?xNear+nearW*.62:xNear+nearW*.20;
+      roundRect(lx1,y2-8,9,h*.052,4,true); roundRect(lx2,y2-18,9,h*.046,4,true);
     }
-    rearBench(true); rearBench(false);
+    sideBench(true); sideBench(false);
     ctx.restore();
   }
     function drawShell(x,y,s=1,rot=0){
@@ -294,9 +301,9 @@
 
     // Outer heavy wood slab with bevel/cut corners.
     ctx.beginPath();
-    ctx.moveTo(topL-54,table.top-32); ctx.lineTo(topR+54,table.top-32);
-    ctx.lineTo(botR+72,table.bottom+42); ctx.lineTo(botR+34,table.bottom+66);
-    ctx.lineTo(botL-34,table.bottom+66); ctx.lineTo(botL-72,table.bottom+42);
+    ctx.moveTo(topL-48,table.top-30); ctx.lineTo(topR+48,table.top-30);
+    ctx.lineTo(botR+64,table.bottom+40); ctx.lineTo(botR+28,table.bottom+62);
+    ctx.lineTo(botL-28,table.bottom+62); ctx.lineTo(botL-64,table.bottom+40);
     ctx.closePath();
     const outer=ctx.createLinearGradient(0,table.top-42,0,table.bottom+76);
     outer.addColorStop(0,'#f4d39a'); outer.addColorStop(.42,'#e5b977'); outer.addColorStop(.78,'#c98d4b'); outer.addColorStop(1,'#a86a35');
@@ -327,8 +334,8 @@
 
     // Inner lighter bevel, separated from the glass inset.
     ctx.beginPath();
-    ctx.moveTo(topL-32,table.top-12); ctx.lineTo(topR+32,table.top-12);
-    ctx.lineTo(botR+50,table.bottom+24); ctx.lineTo(botL-50,table.bottom+24); ctx.closePath();
+    ctx.moveTo(topL-28,table.top-10); ctx.lineTo(topR+28,table.top-10);
+    ctx.lineTo(botR+42,table.bottom+22); ctx.lineTo(botL-42,table.bottom+22); ctx.closePath();
     const bevel=ctx.createLinearGradient(0,table.top,0,table.bottom+18);
     bevel.addColorStop(0,'#ffe7b5'); bevel.addColorStop(.52,'#efc27d'); bevel.addColorStop(1,'#d69a55');
     ctx.fillStyle=bevel; ctx.fill(); ctx.strokeStyle='rgba(122,78,37,.55)'; ctx.lineWidth=4; ctx.stroke();
@@ -337,14 +344,14 @@
     ctx.restore();
 
     // Inset glass/sand tabletop with visible margin from the wooden frame.
-    const iTopL=topL+30, iTopR=topR-30, iBotL=botL+48, iBotR=botR-48, iTop=table.top+34, iBot=table.bottom-56;
+    const iTopL=topL+18, iTopR=topR-18, iBotL=botL+30, iBotR=botR-30, iTop=table.top+30, iBot=table.bottom-48;
     const sand=ctx.createLinearGradient(0,iTop,0,iBot);
     sand.addColorStop(0,'rgba(198,241,232,.55)'); sand.addColorStop(.35,'rgba(252,241,190,.78)'); sand.addColorStop(1,'rgba(244,217,151,.82)');
     ctx.beginPath(); ctx.moveTo(iTopL,iTop); ctx.lineTo(iTopR,iTop); ctx.lineTo(iBotR,iBot); ctx.lineTo(iBotL,iBot); ctx.closePath();
     ctx.fillStyle=sand; ctx.fill();
     ctx.save(); ctx.clip();
-    const aoTop=ctx.createLinearGradient(0,iTop,0,iTop+45); aoTop.addColorStop(0,'rgba(87,61,32,.20)'); aoTop.addColorStop(1,'rgba(87,61,32,0)'); ctx.fillStyle=aoTop; ctx.fillRect(0,iTop,state.w,50);
-    const aoBot=ctx.createLinearGradient(0,iBot-60,0,iBot); aoBot.addColorStop(0,'rgba(87,61,32,0)'); aoBot.addColorStop(1,'rgba(87,61,32,.18)'); ctx.fillStyle=aoBot; ctx.fillRect(0,iBot-60,state.w,70);
+    const aoTop=ctx.createLinearGradient(0,iTop,0,iTop+45); aoTop.addColorStop(0,'rgba(87,61,32,.25)'); aoTop.addColorStop(1,'rgba(87,61,32,0)'); ctx.fillStyle=aoTop; ctx.fillRect(0,iTop,state.w,50);
+    const aoBot=ctx.createLinearGradient(0,iBot-60,0,iBot); aoBot.addColorStop(0,'rgba(87,61,32,0)'); aoBot.addColorStop(1,'rgba(87,61,32,.22)'); ctx.fillStyle=aoBot; ctx.fillRect(0,iBot-60,state.w,70);
     ctx.restore();
     ctx.save(); ctx.shadowColor='rgba(80,52,25,.55)'; ctx.shadowBlur=14; ctx.shadowOffsetY=4; ctx.strokeStyle='rgba(92,59,29,.38)'; ctx.lineWidth=12; ctx.stroke(); ctx.restore();
     ctx.strokeStyle='rgba(38,196,200,.98)'; ctx.lineWidth=7; ctx.stroke();
@@ -353,10 +360,12 @@
     for(let i=0;i<70;i++){ const y=lerp(iTop+8,iBot-8,(i*37%100)/100), b={l:lerp(iTopL,iBotL,(y-iTop)/(iBot-iTop)), r:lerp(iTopR,iBotR,(y-iTop)/(iBot-iTop))}; const x=lerp(b.l+8,b.r-8,(i*53%100)/100); ctx.fillStyle=i%3?'rgba(190,139,72,.13)':'rgba(255,248,201,.22)'; ctx.beginPath(); ctx.arc(x,y,1+(i%4)*.45,0,Math.PI*2); ctx.fill(); }
     ctx.globalAlpha=.18; ctx.fillStyle='#fff2bf'; for(let i=0;i<7;i++){ const y=lerp(iTop+28,iBot-28,i/6), b=xBoundsAt(y); ctx.beginPath(); ctx.ellipse((b.l+b.r)/2,y,(b.r-b.l)*.34,15,.08,0,Math.PI*2); ctx.fill(); }
     ctx.globalAlpha=1;
-    // Keep the sliding lane clean; tiny beach details stay near the rim only.
-    ctx.globalAlpha=.45;
-    drawShell(lerp(iBotL,iBotR,.12),lerp(iTop,iBot,.72),.38,.7);
-    drawPebble(lerp(iTopL,iTopR,.86),lerp(iTop,iBot,.30),.34,'rgba(96,91,86,.26)');
+    // Beach details stay decorative, not blocking the main sliding lane.
+    ctx.globalAlpha=.46;
+    drawShell(lerp(iBotL,iBotR,.12),lerp(iTop,iBot,.72),.42,.7);
+    drawStarfish(lerp(iTopL,iTopR,.82),lerp(iTop,iBot,.24),.38,.35);
+    drawShell(lerp(iTopL,iTopR,.18),lerp(iTop,iBot,.22),.34,-.45);
+    drawPebble(lerp(iTopL,iTopR,.70),lerp(iTop,iBot,.34),.30,'rgba(96,91,86,.24)');
     ctx.globalAlpha=1;
     // Broad diagonal glass highlights, not grid lines.
     ctx.globalAlpha=.28; ctx.strokeStyle='rgba(255,255,255,.86)'; ctx.lineWidth=14; ctx.lineCap='round';
