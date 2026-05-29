@@ -252,49 +252,52 @@
     ctx.fillStyle='rgba(119,202,214,.17)'; for(let i=0;i<5;i++){ ctx.beginPath(); ctx.ellipse(w*(.08+i*.22), h*.455+Math.sin(i)*6, 92, 9, 0,0,Math.PI*2); ctx.fill(); }
     ctx.strokeStyle='rgba(255,255,255,.28)'; ctx.lineWidth=2; ctx.lineCap='round'; for(let i=0;i<4;i++){ ctx.beginPath(); ctx.moveTo(w*(.03+i*.24),h*(.485+i*.012)); ctx.bezierCurveTo(w*(.12+i*.24),h*(.468+i*.012),w*(.20+i*.24),h*(.498+i*.012),w*(.30+i*.24),h*(.482+i*.012)); ctx.stroke(); }
     ctx.fillStyle='rgba(177,122,74,.20)'; for(let i=0;i<18;i++){ ctx.beginPath(); ctx.ellipse((i*97)%w, h*(.60+(i%5)*.07), 13+(i%3)*5, 7+(i%2)*3, .5, 0, Math.PI*2); ctx.fill(); }
-    drawPalm(w*.105,h*.355,.78,-1); drawPalm(w*.895,h*.355,.76,1); drawCanopy();
+    drawPalm(w*.075,h*.615,.76,-1); drawPalm(w*.925,h*.615,.74,1); drawCanopy();
   }
   function drawPalm(x,y,s,flip){
     ctx.save(); ctx.translate(x,y); ctx.scale(s*flip,s);
-    const baseY=250;
-    // Grounded shadow first: wide, soft, and exactly under the trunk base.
-    ctx.save(); ctx.globalAlpha=.95; ctx.fillStyle='rgba(84,55,27,.22)'; ctx.beginPath(); ctx.ellipse(8,baseY+5,54,13,-.05,0,Math.PI*2); ctx.fill(); ctx.restore();
-
-    // Longer curved trunk reaches the sand. Segments and side light give volume.
-    ctx.save(); ctx.rotate(-.085);
-    const trunk=ctx.createLinearGradient(-13,0,16,baseY);
-    trunk.addColorStop(0,'#d09a62'); trunk.addColorStop(.42,'#a96e40'); trunk.addColorStop(.78,'#86512e'); trunk.addColorStop(1,'#653a22');
-    ctx.fillStyle=trunk;
-    ctx.beginPath();
-    ctx.moveTo(-15,baseY); ctx.bezierCurveTo(-4,185,-10,74,-8,-6);
-    ctx.bezierCurveTo(-2,-16,14,-14,18,-3);
-    ctx.bezierCurveTo(13,74,18,185,14,baseY);
-    ctx.quadraticCurveTo(0,baseY+10,-15,baseY); ctx.fill();
-    ctx.strokeStyle='rgba(75,41,20,.30)'; ctx.lineWidth=2.2;
-    for(let i=0;i<12;i++){ const yy=14+i*19; ctx.beginPath(); ctx.moveTo(-11+Math.sin(i*.8)*3,yy+8); ctx.quadraticCurveTo(1,yy-2,14,yy+4); ctx.stroke(); }
-    ctx.strokeStyle='rgba(255,216,151,.25)'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(8,0); ctx.bezierCurveTo(11,74,12,168,8,baseY-10); ctx.stroke();
+    // x/y is the root contact point on the sand. Draw from the ground upward so
+    // the palm is visibly planted, with shadow and sand overlap at the root.
+    ctx.save();
+    ctx.fillStyle='rgba(82,53,28,.26)'; ctx.beginPath(); ctx.ellipse(0,5,62,15,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(236,185,105,.42)'; ctx.beginPath(); ctx.ellipse(0,-2,26,7,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
 
-    function frond(rot,len,w,col,alpha=1,curve=0){
+    const crownY=-235;
+    ctx.save(); ctx.rotate(-.10);
+    const trunk=ctx.createLinearGradient(-14,0,17,crownY);
+    trunk.addColorStop(0,'#6f4326'); trunk.addColorStop(.35,'#906038'); trunk.addColorStop(.72,'#b77d49'); trunk.addColorStop(1,'#d09a61');
+    ctx.fillStyle=trunk;
+    ctx.beginPath();
+    ctx.moveTo(-16,0); ctx.bezierCurveTo(-10,-70,-7,-155,-9,crownY+10);
+    ctx.bezierCurveTo(-4,crownY-2,13,crownY-5,18,crownY+8);
+    ctx.bezierCurveTo(13,-150,17,-70,15,0);
+    ctx.quadraticCurveTo(0,10,-16,0); ctx.fill();
+    ctx.strokeStyle='rgba(76,42,22,.34)'; ctx.lineWidth=2.4;
+    for(let i=0;i<13;i++){ const yy=-12-i*17; ctx.beginPath(); ctx.moveTo(-12+Math.sin(i*.8)*3,yy+5); ctx.quadraticCurveTo(1,yy-4,14,yy+2); ctx.stroke(); }
+    ctx.strokeStyle='rgba(255,216,150,.22)'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(7,-8); ctx.bezierCurveTo(10,-78,9,-165,6,crownY+12); ctx.stroke();
+    ctx.restore();
+
+    ctx.save(); ctx.translate(0,crownY);
+    function frond(rot,len,w,col,alpha=1,bend=0){
       ctx.save(); ctx.rotate(rot); ctx.globalAlpha=alpha; ctx.fillStyle=col;
       ctx.beginPath(); ctx.moveTo(0,0);
-      ctx.bezierCurveTo(len*.20,-w*1.35+curve,len*.60,-w*1.05,len,-w*.18);
-      ctx.bezierCurveTo(len*.64,w*.34,len*.25,w*.30,0,0); ctx.fill();
-      ctx.strokeStyle='rgba(24,83,42,.26)'; ctx.lineWidth=1.25;
-      ctx.beginPath(); ctx.moveTo(5,-1); ctx.bezierCurveTo(len*.34,-w*.72+curve*.35,len*.68,-w*.46,len*.95,-w*.12); ctx.stroke();
-      // Small leaflet cuts break the sticker silhouette.
-      ctx.strokeStyle='rgba(19,87,39,.18)'; ctx.lineWidth=.8;
-      for(let k=2;k<6;k++){ const px=len*k/7; ctx.beginPath(); ctx.moveTo(px,-w*.35); ctx.lineTo(px+8,-w*.72+(k%2)*4); ctx.stroke(); }
+      ctx.bezierCurveTo(len*.16,-w*1.45+bend,len*.58,-w*1.05,len,-w*.18);
+      ctx.bezierCurveTo(len*.64,w*.28,len*.24,w*.24,0,0); ctx.fill();
+      ctx.strokeStyle='rgba(26,86,43,.25)'; ctx.lineWidth=1.15; ctx.beginPath(); ctx.moveTo(4,-1); ctx.bezierCurveTo(len*.34,-w*.80+bend*.35,len*.68,-w*.48,len*.95,-w*.12); ctx.stroke();
+      ctx.strokeStyle='rgba(15,73,34,.16)'; ctx.lineWidth=.7;
+      for(let k=2;k<7;k++){ const px=len*k/8; ctx.beginPath(); ctx.moveTo(px,-w*.32); ctx.lineTo(px+8,-w*.76+(k%2)*5); ctx.stroke(); }
       ctx.restore();
     }
-    // Bigger leaves extend behind the table, with front/back alpha layering.
-    for(const f of [[-1.34,106,20,.44,-5],[-1.02,122,21,.55,2],[-.68,135,22,.66,-3],[-.28,128,21,.58,4],[.18,112,19,.50,-2]]) frond(f[0],f[1],f[2],'#2d8645',f[3],f[4]);
-    for(const f of [[-.95,132,22,.78,3],[-.55,146,23,.88,-4],[-.12,140,22,.86,2],[.34,124,20,.76,-2],[.78,104,18,.66,3]]) frond(f[0],f[1],f[2],'#4caf58',f[3],f[4]);
-    for(const f of [[-1.12,94,16,.62,0],[-.44,110,17,.70,-3],[.16,104,16,.66,3],[.62,90,15,.58,-1]]) frond(f[0],f[1],f[2],'#6bc76d',f[3],f[4]);
+    // Three desaturated leaf layers: back darker, front lighter, all long and thin.
+    for(const f of [[-1.45,118,16,.40,-5],[-1.08,138,17,.50,2],[-.70,154,18,.58,-3],[-.34,145,17,.52,4],[.08,126,15,.45,-1]]) frond(f[0],f[1],f[2],'#2f7f49',f[3],f[4]);
+    for(const f of [[-1.02,146,18,.72,3],[-.62,166,19,.82,-4],[-.18,160,18,.80,2],[.32,140,17,.68,-2],[.78,116,15,.56,3]]) frond(f[0],f[1],f[2],'#4d9f5b',f[3],f[4]);
+    for(const f of [[-1.22,100,13,.48,0],[-.48,124,14,.58,-3],[.10,118,14,.54,3],[.58,96,12,.48,-1]]) frond(f[0],f[1],f[2],'#6eb86c',f[3],f[4]);
     ctx.globalAlpha=1;
-    const crown=ctx.createRadialGradient(-5,-4,3,0,0,19); crown.addColorStop(0,'#75c767'); crown.addColorStop(1,'#2b7e42');
-    ctx.fillStyle=crown; ctx.beginPath(); ctx.arc(0,0,19,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='rgba(113,69,34,.68)'; for(const [cx,cy,r] of [[-8,10,6],[2,13,6],[10,8,5]]){ ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); }
+    const crown=ctx.createRadialGradient(-4,-4,3,0,0,20); crown.addColorStop(0,'#75b965'); crown.addColorStop(1,'#2d7844');
+    ctx.fillStyle=crown; ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(104,65,34,.72)'; for(const [cx,cy,r] of [[-9,10,6],[2,13,6],[11,8,5]]){ ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
     ctx.restore();
   }
   function drawCanopy(){
@@ -655,7 +658,6 @@
 
   function drawParticles(){ for(const p of state.particles){ ctx.globalAlpha=p.a; if(p.type==='coin') drawCoin(p.x,p.y,9); else { ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1; } }
   function drawFloating(){ for(const f of state.floating){ ctx.globalAlpha=f.a; text(f.text,f.x,f.y,22,'#fff','center','bold','#7b2d16'); ctx.globalAlpha=1; } }
-  function drawHand(){ if(state.dragging||state.ended) return; const x=(state.current?state.current.x:state.w*.55)+Math.sin(state.handT*4)*18, y=table.launchY+55; ctx.save(); ctx.translate(x,y); ctx.rotate(-.35); ctx.globalAlpha=.9; ctx.fillStyle='#ffe3c7'; roundRect(-8,-12,24,58,12,true,'#ffe3c7','#9a5b35',2); ctx.beginPath(); ctx.arc(2,-16,12,0,Math.PI*2); ctx.fill(); ctx.restore(); }
   function drawEnd(){ ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(0,0,state.w,state.h); text('试玩完成',state.w/2,state.h*.42,42,'#fff','center','bold'); text('点击任意位置重新开始',state.w/2,state.h*.50,22,'#fff','center','bold'); }
   function drawCoin(x,y,r){ ctx.fillStyle='#ffc83d'; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='#b56a00'; ctx.lineWidth=2; ctx.stroke(); ctx.fillStyle='#fff2a5'; ctx.beginPath(); ctx.arc(x-r*.25,y-r*.3,r*.25,0,Math.PI*2); ctx.fill(); }
   function roundRect(x,y,w,h,r,fill=true,fs,ss,lw){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); if(fs) ctx.fillStyle=fs; if(fill) ctx.fill(); if(ss){ ctx.strokeStyle=ss; ctx.lineWidth=lw||1; ctx.stroke(); } }
