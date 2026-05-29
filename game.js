@@ -16,11 +16,13 @@
     {name:'Royal',   color:'#ffd84d', rim:'#fff',    glass:'#fff9c8'}
   ];
 
+  const testOrders = new URLSearchParams(location.search).get('test') === 'orders';
+
   const state = {
     w: 0, h: 0, portrait: true, coins: 0, displayCoins: 0,
     items: [], particles: [], floating: [], current: null,
-    seq: [0,0,1,1,2,2,3,3,4,4,5,5,6,7,8], seqIndex:0,
-    orders: [{lvl:6, reward:500, done:false}, {lvl:8, reward:600, done:false}],
+    seq: testOrders ? [0,0,1,1,0,0,1,1,2,2,2,2] : [0,0,1,1,2,2,3,3,4,4,5,5,6,7,8], seqIndex:0,
+    orders: testOrders ? [{lvl:1, reward:120, done:false}, {lvl:2, reward:180, done:false}] : [{lvl:6, reward:500, done:false}, {lvl:8, reward:600, done:false}],
     orderIndex:0, dragging:false, pointerX:0, handT:0, ended:false
   };
 
@@ -124,10 +126,10 @@
         it.x += it.vx*dt; it.y += it.vy*dt;
         it.vx *= Math.pow(.10, dt); it.vy *= Math.pow(.18, dt);
         const b=xBoundsAt(it.y), r=it.radius*.72;
-        if(it.x < b.l+r){ it.x=b.l+r; it.vx=Math.abs(it.vx)*.62; }
-        if(it.x > b.r-r){ it.x=b.r-r; it.vx=-Math.abs(it.vx)*.62; }
-        if(it.y < table.top+30){ it.y=table.top+30; it.vy=Math.abs(it.vy)*.38; }
-        if(it.y > table.bottom-30){ it.y=table.bottom-30; it.vy=-Math.abs(it.vy)*.22; }
+        if(it.x < b.l+r){ it.x=b.l+r; it.vx=Math.abs(it.vx)*.34; }
+        if(it.x > b.r-r){ it.x=b.r-r; it.vx=-Math.abs(it.vx)*.34; }
+        if(it.y < table.top+30){ it.y=table.top+30; it.vy=Math.abs(it.vy)*.26; }
+        if(it.y > table.bottom-30){ it.y=table.bottom-30; it.vy=-Math.abs(it.vy)*.16; }
         if(Math.hypot(it.vx,it.vy)<8){ it.vx=0; it.vy=0; }
       }
       it.radius = 34 * scaleAt(it.y) * (1 + it.lvl*0.045);
@@ -178,13 +180,22 @@
           mover.vx *= .82; mover.vy *= .82;
         } else {
           a.x-=nx*push; a.y-=ny*push; b.x+=nx*push; b.y+=ny*push;
-          const rvx=b.vx-a.vx, rvy=b.vy-a.vy, rel=rvx*nx+rvy*ny;
+          const speedA=Math.hypot(a.vx,a.vy), speedB=Math.hypot(b.vx,b.vy);
+          const shooter=speedA>=speedB?a:b, target=shooter===a?b:a;
+          const transfer=clamp(Math.hypot(shooter.vx,shooter.vy)*.32,28,260);
+          const forward=-1; // table far end is upward / smaller y
+          target.vy += forward*transfer;
+          target.vx += (Math.random()-.5)*34 + shooter.vx*.18;
+          shooter.vy *= .72;
+          shooter.vx = shooter.vx*.72 + (Math.random()-.5)*24;
+          // Low-elasticity normal impulse keeps cups from penetrating while preserving shove chains.
+          const rvx=target.vx-shooter.vx, rvy=target.vy-shooter.vy, rel=rvx*nx+rvy*ny;
           if(rel<0){
-            const impulse=-(1.05)*rel*.5;
-            a.vx-=impulse*nx; a.vy-=impulse*ny;
-            b.vx+=impulse*nx; b.vy+=impulse*ny;
+            const impulse=-(.62)*rel*.5;
+            shooter.vx-=impulse*nx; shooter.vy-=impulse*ny;
+            target.vx+=impulse*nx; target.vy+=impulse*ny;
           }
-          a.vx*=.98; a.vy*=.98; b.vx*=.98; b.vy*=.98;
+          shooter.vx*=.98; shooter.vy*=.98; target.vx*=.98; target.vy*=.98;
         }
       }
     }
@@ -199,7 +210,8 @@
     n.lockedX=x; n.lockedY=y;
     n.vx=0; n.vy=0; n.spin=0; n.angle=0; n.active=false; n.frozen=true; n.mergeLock=.22; n.pop=1;
     state.items.push(n);
-    if((old===6 && state.orderIndex===0) || (old===8 && state.orderIndex===1)) completeOrder(n);
+    const targetOrder=state.orders[state.orderIndex];
+    if(targetOrder && lvl>=targetOrder.lvl) completeOrder(n);
     if(lvl>=9){ state.ended=true; addFloat(state.w/2,state.h*.45,'完成！点击重玩'); }
   }
   function completeOrder(item){
