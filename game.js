@@ -252,7 +252,54 @@
     ctx.fillStyle='rgba(119,202,214,.17)'; for(let i=0;i<5;i++){ ctx.beginPath(); ctx.ellipse(w*(.08+i*.22), h*.455+Math.sin(i)*6, 92, 9, 0,0,Math.PI*2); ctx.fill(); }
     ctx.strokeStyle='rgba(255,255,255,.28)'; ctx.lineWidth=2; ctx.lineCap='round'; for(let i=0;i<4;i++){ ctx.beginPath(); ctx.moveTo(w*(.03+i*.24),h*(.485+i*.012)); ctx.bezierCurveTo(w*(.12+i*.24),h*(.468+i*.012),w*(.20+i*.24),h*(.498+i*.012),w*(.30+i*.24),h*(.482+i*.012)); ctx.stroke(); }
     ctx.fillStyle='rgba(177,122,74,.20)'; for(let i=0;i<18;i++){ ctx.beginPath(); ctx.ellipse((i*97)%w, h*(.60+(i%5)*.07), 13+(i%3)*5, 7+(i%2)*3, .5, 0, Math.PI*2); ctx.fill(); }
+    drawIslandPalm(w*.035,h*.610,.70,-1);
+    drawIslandPalm(w*.965,h*.610,.68,1);
     drawCanopy();
+  }
+  function drawIslandPalm(x,y,s,flip){
+    ctx.save(); ctx.translate(x,y); ctx.scale(s*flip,s);
+    // Background decoration: low saturation, partly outside frame, rooted in sand.
+    ctx.save(); ctx.fillStyle='rgba(78,54,28,.20)'; ctx.beginPath(); ctx.ellipse(0,4,42,10,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.rotate(-.13);
+    const trunk=ctx.createLinearGradient(-12,0,14,-220);
+    trunk.addColorStop(0,'#704526'); trunk.addColorStop(.32,'#8f5d35'); trunk.addColorStop(.70,'#b17945'); trunk.addColorStop(1,'#c8945f');
+    ctx.fillStyle=trunk;
+    ctx.beginPath();
+    ctx.moveTo(-12,0); ctx.bezierCurveTo(-8,-70,-6,-145,-8,-220);
+    ctx.bezierCurveTo(-2,-231,12,-231,17,-220);
+    ctx.bezierCurveTo(10,-146,14,-70,12,0);
+    ctx.quadraticCurveTo(0,8,-12,0); ctx.fill();
+    ctx.strokeStyle='rgba(62,38,21,.36)'; ctx.lineWidth=2;
+    for(let i=0;i<12;i++){ const yy=-14-i*17; ctx.beginPath(); ctx.moveTo(-10+Math.sin(i)*2,yy+5); ctx.quadraticCurveTo(0,yy-2,12,yy+3); ctx.stroke(); }
+    ctx.strokeStyle='rgba(255,216,156,.20)'; ctx.lineWidth=3.2; ctx.beginPath(); ctx.moveTo(6,-8); ctx.bezierCurveTo(8,-78,8,-150,5,-214); ctx.stroke();
+    ctx.restore();
+
+    ctx.save(); ctx.translate(2,-224);
+    function palmLeaf(rot,len,color,alpha=1,bend=0){
+      ctx.save(); ctx.rotate(rot); ctx.globalAlpha=alpha;
+      const leaf=ctx.createLinearGradient(0,-20,len,8);
+      leaf.addColorStop(0,color); leaf.addColorStop(.62,color); leaf.addColorStop(1,'rgba(45,101,60,.70)');
+      ctx.fillStyle=leaf;
+      ctx.beginPath(); ctx.moveTo(0,0);
+      ctx.bezierCurveTo(len*.18,-24+bend,len*.58,-34+bend*.2,len,-5);
+      ctx.bezierCurveTo(len*.70,18+bend*.15,len*.24,18,0,0);
+      ctx.fill();
+      ctx.strokeStyle='rgba(31,91,49,.30)'; ctx.lineWidth=1.4; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(5,0); ctx.bezierCurveTo(len*.35,-13+bend*.25,len*.70,-13,len*.96,-4); ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,210,.10)'; ctx.lineWidth=1;
+      for(let k=3;k<8;k++){ const t=k/9, px=len*t, py=-Math.sin(t*Math.PI)*12; ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px+10,py+8); ctx.stroke(); }
+      ctx.restore();
+    }
+    const leaves=[[-2.25,70,'rgba(45,113,70,.68)',.38,-8],[-1.86,88,'rgba(55,131,75,.74)',.48,5],[-1.48,104,'rgba(68,145,82,.80)',.58,-4],[-1.10,116,'rgba(83,158,88,.84)',.68,6],[-.72,118,'rgba(78,150,84,.82)',.72,-5],[-.34,106,'rgba(68,137,78,.72)',.62,4],[.05,86,'rgba(54,118,70,.62)',.48,-2]];
+    for(const l of leaves) palmLeaf(...l);
+    ctx.globalAlpha=1;
+    const crown=ctx.createRadialGradient(-4,-4,2,0,0,16); crown.addColorStop(0,'#6fb263'); crown.addColorStop(1,'#2e7542');
+    ctx.fillStyle=crown; ctx.beginPath(); ctx.arc(0,0,16,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(105,65,35,.62)'; for(const [cx,cy,r] of [[-7,8,5],[2,11,5],[9,7,4]]){ ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
+    // A thin sand lip hides the root so it feels planted instead of pasted.
+    ctx.fillStyle='rgba(235,188,105,.35)'; ctx.beginPath(); ctx.ellipse(0,1,22,5,0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
   }
   function drawCanopy(){
     const w=state.w,h=state.h; ctx.save();
