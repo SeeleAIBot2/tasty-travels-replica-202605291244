@@ -41,11 +41,11 @@
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
     // Locked to the original playable's vertical phone composition.
-    table.top = h*0.325;
-    table.bottom = h*0.855;
-    table.launchY = h*0.755;
-    table.leftBottom = w*.00; table.rightBottom = w*1.00;
-    table.leftTop = w*.28; table.rightTop = w*.72;
+    table.top = h*0.378;
+    table.bottom = h*0.705;
+    table.launchY = h*0.648;
+    table.leftBottom = w*.075; table.rightBottom = w*.925;
+    table.leftTop = w*.36; table.rightTop = w*.64;
   }
 
   function xBoundsAt(y){
@@ -243,24 +243,88 @@
   function drawCanopy(){ const w=state.w,h=state.h; ctx.save(); ctx.fillStyle='#8c5a32'; ctx.fillRect(0,h*.05,w,h*.04); ctx.fillStyle='#84a83a'; for(let x=-30;x<w+40;x+=48){ ctx.beginPath(); ctx.moveTo(x,h*.04); ctx.quadraticCurveTo(x+24,h*.16,x+52,h*.04); ctx.closePath(); ctx.fill(); } ctx.fillStyle='#6d8b30'; for(let x=-20;x<w+40;x+=64){ ctx.beginPath(); ctx.ellipse(x,h*.065,58,18,.15,0,Math.PI*2); ctx.fill(); } ctx.restore(); }
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
   function drawBenches(){ const w=state.w,h=state.h; const y=h*.57; ctx.save(); ctx.fillStyle='#ad7545'; ctx.strokeStyle='#714322'; ctx.lineWidth=4; roundRect(w*.02,y,w*.20,h*.32,10,true); ctx.stroke(); roundRect(w*.78,y,w*.20,h*.32,10,true); ctx.stroke(); ctx.fillStyle='rgba(90,48,22,.35)'; ctx.fillRect(w*.07,y+h*.30,12,h*.12); ctx.fillRect(w*.88,y+h*.30,12,h*.12); ctx.restore(); }
+  function drawShell(x,y,s=1,rot=0){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
+    ctx.fillStyle='rgba(255,238,197,.9)'; ctx.strokeStyle='rgba(142,100,58,.55)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(-13,9); ctx.quadraticCurveTo(0,-18,15,9); ctx.quadraticCurveTo(0,15,-13,9); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle='rgba(142,100,58,.35)'; for(let i=-2;i<=2;i++){ ctx.beginPath(); ctx.moveTo(0,-11); ctx.lineTo(i*5,8); ctx.stroke(); }
+    ctx.restore();
+  }
+  function drawStarfish(x,y,s=1,rot=0){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s); ctx.fillStyle='rgba(239,118,70,.88)'; ctx.strokeStyle='rgba(151,75,43,.45)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); for(let i=0;i<10;i++){ const r=i%2?6:15, a=-Math.PI/2+i*Math.PI/5; ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r); } ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='rgba(255,218,126,.8)'; ctx.beginPath(); ctx.arc(0,0,3,0,Math.PI*2); ctx.fill(); ctx.restore();
+  }
+  function drawPebble(x,y,s=1,c='rgba(125,103,78,.45)'){
+    ctx.save(); ctx.translate(x,y); ctx.scale(s,s); ctx.fillStyle=c; ctx.beginPath(); ctx.ellipse(0,0,8,5,.35,0,Math.PI*2); ctx.fill(); ctx.restore();
+  }
   function drawTable(){
     const topL=table.leftTop, topR=table.rightTop, botL=table.leftBottom, botR=table.rightBottom;
-    // table legs / lower construction visible like the original phone shot
+    const h=state.h;
+    // Chunky legs tucked under the near rail, partially hidden by the table edge.
     ctx.save();
-    ctx.fillStyle='#75431f';
-    roundRect(botL+18,table.bottom-8,24,state.h*.12,10,true);
-    roundRect(botR-42,table.bottom-8,24,state.h*.12,10,true);
-    ctx.fillStyle='#a96b35';
-    ctx.beginPath(); ctx.moveTo(botL-12,table.bottom+16); ctx.lineTo(botR+12,table.bottom+16); ctx.lineTo(botR-8,table.bottom+50); ctx.lineTo(botL+8,table.bottom+50); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#6a3719';
+    roundRect(botL+58,table.bottom+18,38,h*.13,12,true);
+    roundRect(botR-96,table.bottom+18,38,h*.13,12,true);
+    ctx.fillStyle='rgba(255,190,107,.18)';
+    roundRect(botL+70,table.bottom+28,9,h*.10,5,true);
+    roundRect(botR-84,table.bottom+28,9,h*.10,5,true);
     ctx.restore();
-    // thick wooden frame, much wider at bottom
-    ctx.beginPath(); ctx.moveTo(topL-34,table.top-24); ctx.lineTo(topR+34,table.top-24); ctx.lineTo(botR+42,table.bottom+20); ctx.lineTo(botL-42,table.bottom+20); ctx.closePath();
-    const wood=ctx.createLinearGradient(0,table.top,0,table.bottom); wood.addColorStop(0,'#cf8b46'); wood.addColorStop(.5,'#9d602d'); wood.addColorStop(1,'#6e3b1b'); ctx.fillStyle=wood; ctx.fill(); ctx.strokeStyle='#4d2815'; ctx.lineWidth=8; ctx.stroke();
-    ctx.save(); ctx.globalAlpha=.25; ctx.strokeStyle='#f4c27c'; ctx.lineWidth=5; for(let k=0;k<5;k++){ ctx.beginPath(); ctx.moveTo(lerp(topL,topR,k/4)-30,table.top-12); ctx.lineTo(lerp(botL,botR,k/4)-60+k*30,table.bottom+10); ctx.stroke(); } ctx.restore();
-    // inset glass / sand surface
-    const grd=ctx.createLinearGradient(0,table.top,0,table.bottom); grd.addColorStop(0,'rgba(122,230,246,.72)'); grd.addColorStop(.38,'rgba(220,250,232,.78)'); grd.addColorStop(1,'rgba(255,226,148,.88)');
-    ctx.beginPath(); ctx.moveTo(topL,table.top); ctx.lineTo(topR,table.top); ctx.lineTo(botR,table.bottom); ctx.lineTo(botL,table.bottom); ctx.closePath(); ctx.fillStyle=grd; ctx.fill(); ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=4; ctx.stroke();
-    ctx.save(); ctx.clip(); ctx.globalAlpha=.18; ctx.fillStyle='#fff'; for(let i=0;i<7;i++){ const y=lerp(table.top+25,table.bottom-25,i/6), b=xBoundsAt(y); ctx.beginPath(); ctx.ellipse((b.l+b.r)/2,y,(b.r-b.l)*.43,5,0,0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=.22; for(let i=0;i<55;i++){ const y=lerp(table.top+10,table.bottom-12,(i*37%100)/100), b=xBoundsAt(y), x=lerp(b.l+8,b.r-8,(i*53%100)/100); ctx.fillStyle=i%2?'rgba(185,135,72,.45)':'rgba(255,244,195,.55)'; ctx.beginPath(); ctx.arc(x,y,1.2+(i%3)*.45,0,Math.PI*2); ctx.fill(); } ctx.restore();
+
+    // Outer heavy wood slab with bevel/cut corners.
+    ctx.beginPath();
+    ctx.moveTo(topL-48,table.top-28); ctx.lineTo(topR+48,table.top-28);
+    ctx.lineTo(botR+68,table.bottom+38); ctx.lineTo(botR+34,table.bottom+82);
+    ctx.lineTo(botL-34,table.bottom+82); ctx.lineTo(botL-68,table.bottom+38);
+    ctx.closePath();
+    const outer=ctx.createLinearGradient(0,table.top-35,0,table.bottom+72);
+    outer.addColorStop(0,'#d8954c'); outer.addColorStop(.38,'#9b5a27'); outer.addColorStop(1,'#3f1d0b');
+    ctx.fillStyle=outer; ctx.fill(); ctx.strokeStyle='#3f1f0d'; ctx.lineWidth=8; ctx.stroke();
+    // Visible lower leg sections below the chunky near rail.
+    ctx.save();
+    ctx.fillStyle='#5b2b11';
+    roundRect(botL+88,table.bottom+58,34,h*.075,11,true);
+    roundRect(botR-122,table.bottom+58,34,h*.075,11,true);
+    ctx.fillStyle='#7d421d';
+    roundRect(botL+78,table.bottom+104,54,13,7,true);
+    roundRect(botR-132,table.bottom+104,54,13,7,true);
+    ctx.restore();
+
+    // Inner lighter bevel, separated from the glass inset.
+    ctx.beginPath();
+    ctx.moveTo(topL-24,table.top-8); ctx.lineTo(topR+24,table.top-8);
+    ctx.lineTo(botR+40,table.bottom+18); ctx.lineTo(botL-40,table.bottom+18); ctx.closePath();
+    const bevel=ctx.createLinearGradient(0,table.top,0,table.bottom+18);
+    bevel.addColorStop(0,'#e3a55f'); bevel.addColorStop(.55,'#b66f31'); bevel.addColorStop(1,'#764018');
+    ctx.fillStyle=bevel; ctx.fill(); ctx.strokeStyle='rgba(75,36,13,.75)'; ctx.lineWidth=3; ctx.stroke();
+    ctx.save(); ctx.globalAlpha=.32; ctx.strokeStyle='#f6c98a'; ctx.lineWidth=5;
+    for(let k=0;k<6;k++){ ctx.beginPath(); ctx.moveTo(lerp(topL,topR,k/5)-34,table.top-14); ctx.lineTo(lerp(botL,botR,k/5)-70+k*28,table.bottom+50); ctx.stroke(); }
+    ctx.restore();
+
+    // Inset glass/sand tabletop with visible margin from the wooden frame.
+    const iTopL=topL+9, iTopR=topR-9, iBotL=botL+34, iBotR=botR-34, iTop=table.top+14, iBot=table.bottom-18;
+    const sand=ctx.createLinearGradient(0,iTop,0,iBot);
+    sand.addColorStop(0,'rgba(135,230,234,.62)'); sand.addColorStop(.34,'rgba(241,230,154,.82)'); sand.addColorStop(1,'rgba(238,193,103,.9)');
+    ctx.beginPath(); ctx.moveTo(iTopL,iTop); ctx.lineTo(iTopR,iTop); ctx.lineTo(iBotR,iBot); ctx.lineTo(iBotL,iBot); ctx.closePath();
+    ctx.fillStyle=sand; ctx.fill(); ctx.strokeStyle='rgba(56,205,207,.95)'; ctx.lineWidth=5; ctx.stroke();
+    ctx.save(); ctx.clip();
+    // Cloudy sand and small grain noise.
+    for(let i=0;i<120;i++){ const y=lerp(iTop+8,iBot-8,(i*37%100)/100), b={l:lerp(iTopL,iBotL,(y-iTop)/(iBot-iTop)), r:lerp(iTopR,iBotR,(y-iTop)/(iBot-iTop))}; const x=lerp(b.l+8,b.r-8,(i*53%100)/100); ctx.fillStyle=i%3?'rgba(190,139,72,.22)':'rgba(255,248,201,.35)'; ctx.beginPath(); ctx.arc(x,y,1+(i%4)*.45,0,Math.PI*2); ctx.fill(); }
+    ctx.globalAlpha=.18; ctx.fillStyle='#fff2bf'; for(let i=0;i<7;i++){ const y=lerp(iTop+28,iBot-28,i/6), b=xBoundsAt(y); ctx.beginPath(); ctx.ellipse((b.l+b.r)/2,y,(b.r-b.l)*.34,15,.08,0,Math.PI*2); ctx.fill(); }
+    ctx.globalAlpha=1;
+    // Fixed beach objects.
+    drawShell(lerp(iTopL,iTopR,.28),lerp(iTop,iBot,.26),.55,-.5);
+    drawStarfish(lerp(iBotL,iBotR,.73),lerp(iTop,iBot,.62),.62,.4);
+    drawShell(lerp(iBotL,iBotR,.18),lerp(iTop,iBot,.72),.48,.7);
+    drawPebble(lerp(iTopL,iTopR,.67),lerp(iTop,iBot,.33),.55);
+    drawPebble(lerp(iBotL,iBotR,.48),lerp(iTop,iBot,.78),.45,'rgba(96,91,86,.38)');
+    // Broad diagonal glass highlights, not grid lines.
+    ctx.globalAlpha=.28; ctx.strokeStyle='rgba(255,255,255,.86)'; ctx.lineWidth=14; ctx.lineCap='round';
+    [[.18,.02,.45,.98],[.47,.00,.70,.92],[.70,.10,.92,.86]].forEach(([a,b,c,d])=>{ ctx.beginPath(); ctx.moveTo(lerp(iTopL,iTopR,a),lerp(iTop,iBot,b)); ctx.lineTo(lerp(iBotL,iBotR,c),lerp(iTop,iBot,d)); ctx.stroke(); });
+    ctx.restore();
+    // Glass thickness rim.
+    ctx.beginPath(); ctx.moveTo(iTopL,iTop); ctx.lineTo(iTopR,iTop); ctx.lineTo(iBotR,iBot); ctx.lineTo(iBotL,iBot); ctx.closePath();
+    ctx.strokeStyle='rgba(197,255,250,.65)'; ctx.lineWidth=2; ctx.stroke();
   }
   function drawHUD(){
     const w=state.w, h=state.h;
@@ -283,7 +347,7 @@
     ctx.restore();
   }
   function drawQueue(){
-    const w=state.w,h=state.h,y=h*.905;
+    const w=state.w,h=state.h,y=h*.925;
     roundRect(w*.08,y-22,w*.58,44,22,true,'rgba(255,255,255,.92)','#7b4a27',3);
     for(let i=0;i<6;i++){
       const x=w*.145+i*w*.085;
@@ -291,7 +355,7 @@
       if(i<5){ ctx.strokeStyle='rgba(108,70,38,.38)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x+17,y); ctx.lineTo(x+w*.085-17,y); ctx.stroke(); }
     }
     roundRect(w*.73,y-28,w*.22,56,15,true,'#42c955','#1b7d2b',3); text('下载',w*.84,y+2,20,'#fff','center','bold','#126320');
-    text('Tasty Travels',w*.17,h*.965,17,'#fff','center','bold','#185c5f');
+    text('Tasty Travels',w*.17,h*.975,16,'#fff','center','bold','#185c5f');
   }
   function drawItem(it){
     if(it.aim){ ctx.save(); ctx.translate(it.x,it.y); ctx.rotate(it.norm*.30); ctx.strokeStyle='rgba(255,255,255,.98)'; ctx.lineWidth=5; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,-it.radius*.95); ctx.lineTo(0,-Math.max(150,state.h*.25)); ctx.stroke(); ctx.restore(); }
