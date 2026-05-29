@@ -148,8 +148,6 @@
       if(d>0 && a.lvl===b.lvl && a.lvl<9 && !a.mergeLock && !b.mergeLock && d<mergeR){
         const slow=Math.hypot(a.vx-b.vx,a.vy-b.vy)<520;
         if(slow || d<touch){
-          a.x=lerp(a.x,(a.x+b.x)/2,.35); a.y=lerp(a.y,(a.y+b.y)/2,.35);
-          b.x=lerp(b.x,(a.x+b.x)/2,.35); b.y=lerp(b.y,(a.y+b.y)/2,.35);
           merge(a,b); return;
         }
       }
@@ -164,7 +162,11 @@
     const x=(a.x+b.x)/2, y=(a.y+b.y)/2, old=a.lvl, lvl=old+1;
     a.dead=b.dead=true; burst(x,y,drinks[lvl].color); addFloat(x,y,'合成升级');
     if(old===5) addCoins(300,x,y); if(old===6||old===7||old===8) addCoins(500,x,y);
-    const n=makeItem(lvl,x,y); n.vy=160; n.mergeLock=.25; n.pop=1; state.items.push(n);
+    const n=makeItem(lvl,x,y);
+    // Merge result must be born exactly at the contact midpoint and stay stable.
+    // Do not inherit velocity, add bounce, or slide forward after merging.
+    n.vx=0; n.vy=0; n.spin=0; n.angle=0; n.active=true; n.mergeLock=.35; n.pop=1;
+    state.items.push(n);
     if((old===6 && state.orderIndex===0) || (old===8 && state.orderIndex===1)) completeOrder(n);
     if(lvl>=9){ state.ended=true; addFloat(state.w/2,state.h*.45,'完成！点击重玩'); }
   }
