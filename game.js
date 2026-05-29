@@ -41,11 +41,11 @@
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
     // Locked to the original playable's vertical phone composition.
-    table.top = h*0.335;
-    table.bottom = h*0.855;
-    table.launchY = h*0.765;
-    table.leftBottom = w*.070; table.rightBottom = w*.930;
-    table.leftTop = w*.295; table.rightTop = w*.705;
+    table.top = h*0.292;
+    table.bottom = h*0.865;
+    table.launchY = h*0.775;
+    table.leftBottom = w*.025; table.rightBottom = w*.975;
+    table.leftTop = w*.145; table.rightTop = w*.855;
   }
 
   function xBoundsAt(y){
@@ -244,34 +244,24 @@
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
   function drawBenches(){
     const w=state.w,h=state.h;
-    // Reference-style side benches: low horizontal wooden seats, partially hidden by the table.
-    const y=h*.565, bh=h*.245;
+    // Small rear-side stools like environment props; keep them behind the main tray.
+    const y=h*.475, bh=h*.125;
     ctx.save();
-    function lowBench(left){
-      const x = left ? -w*.02 : w*.835;
-      const bw = w*.185;
+    function rearBench(left){
+      const x = left ? -w*.035 : w*.875;
+      const bw = w*.135;
       const g=ctx.createLinearGradient(0,y,0,y+bh);
-      g.addColorStop(0,'#dfb173');
-      g.addColorStop(.55,'#c89150');
-      g.addColorStop(1,'#9d6536');
-      ctx.fillStyle=g; ctx.strokeStyle='#8a5a31'; ctx.lineWidth=3;
-      // Seat top is a short plank, not a tall side wall.
-      roundRect(x,y,bw,bh,7,true); ctx.stroke();
-      ctx.fillStyle='rgba(255,226,166,.32)';
-      roundRect(x+bw*.18,y+10,bw*.58,bh-20,5,true);
-      ctx.strokeStyle='rgba(104,67,35,.34)'; ctx.lineWidth=2;
-      for(let i=1;i<=3;i++){
-        const px=x+bw*(.18+i*.17);
-        ctx.beginPath(); ctx.moveTo(px,y+8); ctx.lineTo(px,y+bh-10); ctx.stroke();
-      }
-      // Thin side thickness and two legs visible below, matching the reference bench feel.
-      ctx.fillStyle='rgba(96,55,25,.22)';
-      if(left) ctx.fillRect(x+bw-10,y+8,10,bh-16); else ctx.fillRect(x,y+8,10,bh-16);
-      ctx.fillStyle='#8f562d';
-      roundRect(x+bw*.25,y+bh-4,14,h*.085,5,true);
-      roundRect(x+bw*.68,y+bh-9,14,h*.080,5,true);
+      g.addColorStop(0,'#dfb77b'); g.addColorStop(.62,'#c58f50'); g.addColorStop(1,'#9c6638');
+      ctx.fillStyle=g; ctx.strokeStyle='rgba(128,82,39,.75)'; ctx.lineWidth=2.5;
+      roundRect(x,y,bw,bh,8,true); ctx.stroke();
+      ctx.fillStyle='rgba(255,230,176,.28)'; roundRect(x+bw*.16,y+8,bw*.60,bh-16,5,true);
+      ctx.strokeStyle='rgba(99,63,31,.28)'; ctx.lineWidth=1.5;
+      for(let i=1;i<=2;i++){ const px=x+bw*(.25+i*.20); ctx.beginPath(); ctx.moveTo(px,y+8); ctx.lineTo(px,y+bh-8); ctx.stroke(); }
+      ctx.fillStyle='rgba(116,70,32,.75)';
+      roundRect(x+bw*.24,y+bh-2,9,h*.046,4,true);
+      roundRect(x+bw*.67,y+bh-5,9,h*.042,4,true);
     }
-    lowBench(true); lowBench(false);
+    rearBench(true); rearBench(false);
     ctx.restore();
   }
     function drawShell(x,y,s=1,rot=0){
@@ -305,8 +295,8 @@
     // Outer heavy wood slab with bevel/cut corners.
     ctx.beginPath();
     ctx.moveTo(topL-54,table.top-32); ctx.lineTo(topR+54,table.top-32);
-    ctx.lineTo(botR+68,table.bottom+42); ctx.lineTo(botR+30,table.bottom+76);
-    ctx.lineTo(botL-30,table.bottom+76); ctx.lineTo(botL-68,table.bottom+42);
+    ctx.lineTo(botR+72,table.bottom+42); ctx.lineTo(botR+34,table.bottom+66);
+    ctx.lineTo(botL-34,table.bottom+66); ctx.lineTo(botL-72,table.bottom+42);
     ctx.closePath();
     const outer=ctx.createLinearGradient(0,table.top-42,0,table.bottom+76);
     outer.addColorStop(0,'#f4d39a'); outer.addColorStop(.42,'#e5b977'); outer.addColorStop(.78,'#c98d4b'); outer.addColorStop(1,'#a86a35');
@@ -330,12 +320,9 @@
     ctx.restore();
     // Visible lower leg sections below the chunky near rail.
     ctx.save();
-    ctx.fillStyle='rgba(151,91,43,.58)';
-    roundRect(botL+88,table.bottom+56,34,h*.058,9,true);
-    roundRect(botR-122,table.bottom+56,34,h*.058,9,true);
-    ctx.fillStyle='rgba(166,99,47,.55)';
-    roundRect(botL+80,table.bottom+92,50,11,6,true);
-    roundRect(botR-130,table.bottom+92,50,11,6,true);
+    ctx.fillStyle='rgba(95,54,26,.22)';
+    roundRect(botL+96,table.bottom+42,34,h*.040,9,true);
+    roundRect(botR-130,table.bottom+42,34,h*.040,9,true);
     ctx.restore();
 
     // Inner lighter bevel, separated from the glass inset.
@@ -346,11 +333,11 @@
     bevel.addColorStop(0,'#ffe7b5'); bevel.addColorStop(.52,'#efc27d'); bevel.addColorStop(1,'#d69a55');
     ctx.fillStyle=bevel; ctx.fill(); ctx.strokeStyle='rgba(122,78,37,.55)'; ctx.lineWidth=4; ctx.stroke();
     ctx.save(); ctx.globalAlpha=.32; ctx.strokeStyle='rgba(255,224,158,.78)'; ctx.lineWidth=5;
-    for(let k=0;k<6;k++){ ctx.beginPath(); ctx.moveTo(lerp(topL,topR,k/5)-34,table.top-14); ctx.lineTo(lerp(botL,botR,k/5)-70+k*28,table.bottom+50); ctx.stroke(); }
+    for(let k=0;k<4;k++){ ctx.beginPath(); ctx.moveTo(lerp(topL,topR,k/3)-28,table.top-14); ctx.lineTo(lerp(botL,botR,k/3)-48+k*22,table.bottom+42); ctx.stroke(); }
     ctx.restore();
 
     // Inset glass/sand tabletop with visible margin from the wooden frame.
-    const iTopL=topL+34, iTopR=topR-34, iBotL=botL+78, iBotR=botR-78, iTop=table.top+30, iBot=table.bottom-42;
+    const iTopL=topL+30, iTopR=topR-30, iBotL=botL+48, iBotR=botR-48, iTop=table.top+34, iBot=table.bottom-56;
     const sand=ctx.createLinearGradient(0,iTop,0,iBot);
     sand.addColorStop(0,'rgba(198,241,232,.55)'); sand.addColorStop(.35,'rgba(252,241,190,.78)'); sand.addColorStop(1,'rgba(244,217,151,.82)');
     ctx.beginPath(); ctx.moveTo(iTopL,iTop); ctx.lineTo(iTopR,iTop); ctx.lineTo(iBotR,iBot); ctx.lineTo(iBotL,iBot); ctx.closePath();
