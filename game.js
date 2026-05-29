@@ -41,11 +41,11 @@
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
     // Locked to the original playable's vertical phone composition.
-    table.top = h*0.378;
-    table.bottom = h*0.705;
-    table.launchY = h*0.648;
-    table.leftBottom = w*.075; table.rightBottom = w*.925;
-    table.leftTop = w*.36; table.rightTop = w*.64;
+    table.top = h*0.335;
+    table.bottom = h*0.835;
+    table.launchY = h*0.755;
+    table.leftBottom = w*.065; table.rightBottom = w*.935;
+    table.leftTop = w*.355; table.rightTop = w*.645;
   }
 
   function xBoundsAt(y){
@@ -237,12 +237,12 @@
     // sea foam and sand details
     ctx.fillStyle='rgba(255,255,255,.72)'; for(let i=0;i<7;i++){ ctx.beginPath(); ctx.ellipse(w*(-.05+i*.19), h*.40+Math.sin(i*1.7)*9, 74, 8, 0,0,Math.PI*2); ctx.fill(); }
     ctx.fillStyle='rgba(177,122,74,.18)'; for(let i=0;i<12;i++){ ctx.beginPath(); ctx.ellipse((i*97)%w, h*(.63+(i%5)*.07), 13, 8, .5, 0, Math.PI*2); ctx.fill(); }
-    drawPalm(w*.12,h*.29,.72,-1); drawPalm(w*.88,h*.29,.70,1); drawCanopy();
+    drawPalm(w*.12,h*.29,.72,-1); drawPalm(w*.88,h*.29,.70,1); drawCanopy(); drawBenches();
   }
   function drawPalm(x,y,s,flip){ ctx.save(); ctx.translate(x,y); ctx.scale(s*flip,s); ctx.fillStyle='#96633d'; ctx.rotate(-.12); roundRect(-9,-8,18,170,8,true); ctx.rotate(.12); ctx.fillStyle='#49aa52'; for(let i=-3;i<=3;i++){ ctx.save(); ctx.rotate(i*.34); ctx.beginPath(); ctx.ellipse(40,-10,64,17,0,0,Math.PI*2); ctx.fill(); ctx.restore(); } ctx.fillStyle='#3c9349'; ctx.beginPath(); ctx.arc(0,0,18,0,Math.PI*2); ctx.fill(); ctx.restore(); }
   function drawCanopy(){ const w=state.w,h=state.h; ctx.save(); ctx.fillStyle='#8c5a32'; ctx.fillRect(0,h*.05,w,h*.04); ctx.fillStyle='#84a83a'; for(let x=-30;x<w+40;x+=48){ ctx.beginPath(); ctx.moveTo(x,h*.04); ctx.quadraticCurveTo(x+24,h*.16,x+52,h*.04); ctx.closePath(); ctx.fill(); } ctx.fillStyle='#6d8b30'; for(let x=-20;x<w+40;x+=64){ ctx.beginPath(); ctx.ellipse(x,h*.065,58,18,.15,0,Math.PI*2); ctx.fill(); } ctx.restore(); }
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
-  function drawBenches(){ const w=state.w,h=state.h; const y=h*.57; ctx.save(); ctx.fillStyle='#ad7545'; ctx.strokeStyle='#714322'; ctx.lineWidth=4; roundRect(w*.02,y,w*.20,h*.32,10,true); ctx.stroke(); roundRect(w*.78,y,w*.20,h*.32,10,true); ctx.stroke(); ctx.fillStyle='rgba(90,48,22,.35)'; ctx.fillRect(w*.07,y+h*.30,12,h*.12); ctx.fillRect(w*.88,y+h*.30,12,h*.12); ctx.restore(); }
+  function drawBenches(){ const w=state.w,h=state.h; const y=h*.55; ctx.save(); ctx.fillStyle='#b9824d'; ctx.strokeStyle='#714322'; ctx.lineWidth=4; roundRect(w*.00,y,w*.18,h*.33,8,true); ctx.stroke(); roundRect(w*.82,y,w*.18,h*.33,8,true); ctx.stroke(); ctx.fillStyle='rgba(255,207,132,.24)'; roundRect(w*.03,y+8,w*.12,h*.29,6,true); roundRect(w*.85,y+8,w*.12,h*.29,6,true); ctx.fillStyle='rgba(90,48,22,.42)'; ctx.fillRect(w*.07,y+h*.30,13,h*.13); ctx.fillRect(w*.90,y+h*.30,13,h*.13); ctx.restore(); }
   function drawShell(x,y,s=1,rot=0){
     ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
     ctx.fillStyle='rgba(255,238,197,.9)'; ctx.strokeStyle='rgba(142,100,58,.55)'; ctx.lineWidth=1.5;
@@ -274,8 +274,8 @@
     // Outer heavy wood slab with bevel/cut corners.
     ctx.beginPath();
     ctx.moveTo(topL-48,table.top-28); ctx.lineTo(topR+48,table.top-28);
-    ctx.lineTo(botR+68,table.bottom+38); ctx.lineTo(botR+34,table.bottom+82);
-    ctx.lineTo(botL-34,table.bottom+82); ctx.lineTo(botL-68,table.bottom+38);
+    ctx.lineTo(botR+62,table.bottom+42); ctx.lineTo(botR+28,table.bottom+86);
+    ctx.lineTo(botL-28,table.bottom+86); ctx.lineTo(botL-62,table.bottom+42);
     ctx.closePath();
     const outer=ctx.createLinearGradient(0,table.top-35,0,table.bottom+72);
     outer.addColorStop(0,'#d8954c'); outer.addColorStop(.38,'#9b5a27'); outer.addColorStop(1,'#3f1d0b');
@@ -283,8 +283,8 @@
     // Visible lower leg sections below the chunky near rail.
     ctx.save();
     ctx.fillStyle='#5b2b11';
-    roundRect(botL+88,table.bottom+58,34,h*.075,11,true);
-    roundRect(botR-122,table.bottom+58,34,h*.075,11,true);
+    roundRect(botL+84,table.bottom+58,36,h*.080,11,true);
+    roundRect(botR-120,table.bottom+58,36,h*.080,11,true);
     ctx.fillStyle='#7d421d';
     roundRect(botL+78,table.bottom+104,54,13,7,true);
     roundRect(botR-132,table.bottom+104,54,13,7,true);
@@ -321,6 +321,11 @@
     // Broad diagonal glass highlights, not grid lines.
     ctx.globalAlpha=.28; ctx.strokeStyle='rgba(255,255,255,.86)'; ctx.lineWidth=14; ctx.lineCap='round';
     [[.18,.02,.45,.98],[.47,.00,.70,.92],[.70,.10,.92,.86]].forEach(([a,b,c,d])=>{ ctx.beginPath(); ctx.moveTo(lerp(iTopL,iTopR,a),lerp(iTop,iBot,b)); ctx.lineTo(lerp(iBotL,iBotR,c),lerp(iTop,iBot,d)); ctx.stroke(); });
+    // Original-style aiming guides: one center line and one dashed horizontal threshold.
+    ctx.globalAlpha=.82; ctx.strokeStyle='rgba(255,255,255,.92)'; ctx.lineWidth=4; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo((iTopL+iTopR)/2,iTop+8); ctx.lineTo((iBotL+iBotR)/2,iBot-24); ctx.stroke();
+    const dashY=lerp(iTop,iBot,.74), db={l:lerp(iTopL,iBotL,.74), r:lerp(iTopR,iBotR,.74)};
+    ctx.setLineDash([12,12]); ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(db.l+8,dashY); ctx.lineTo(db.r-8,dashY); ctx.stroke(); ctx.setLineDash([]);
     ctx.restore();
     // Glass thickness rim.
     ctx.beginPath(); ctx.moveTo(iTopL,iTop); ctx.lineTo(iTopR,iTop); ctx.lineTo(iBotR,iBot); ctx.lineTo(iBotL,iBot); ctx.closePath();
