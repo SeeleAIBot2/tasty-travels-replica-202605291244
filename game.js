@@ -146,22 +146,19 @@
       it.radius = 34 * scaleAt(it.y) * (1 + it.lvl*0.045);
     }
     collideAndMerge();
-    state.items = state.items.filter(i=>!i.dead);
-    limitDeskItems();
+    // Keep all valid desk drinks. Items are removed only by merge/order completion
+    // or by explicit safety cleanup if they become unrecoverably invalid.
+    state.items = state.items.filter(i=>!i.dead && isItemRecoverable(i));
     for(const p of state.particles){ p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=280*dt; p.life-=dt; p.a=Math.max(0,p.life/p.max); }
     state.particles=state.particles.filter(p=>p.life>0);
     for(const f of state.floating){ f.y-=35*dt; f.life-=dt; f.a=Math.max(0,f.life/f.max); }
     state.floating=state.floating.filter(f=>f.life>0);
   }
 
-  function limitDeskItems(){
-    const desk = state.items.filter(i=>!i.aim && !i.dead);
-    if(desk.length<=6) return;
-    desk.sort((a,b)=>a.born-b.born || a.lvl-b.lvl);
-    for(const it of desk.slice(0, desk.length-6)){
-      it.dead=true;
-      if(Math.random()<.7) addFloat(it.x,it.y,'清理');
-    }
+  function isItemRecoverable(it){
+    if(!Number.isFinite(it.x)||!Number.isFinite(it.y)||!Number.isFinite(it.lvl)) return false;
+    const margin=Math.max(state.w,state.h)*1.5;
+    return it.x>-margin && it.x<state.w+margin && it.y>-margin && it.y<state.h+margin;
   }
 
   function collideAndMerge(){
