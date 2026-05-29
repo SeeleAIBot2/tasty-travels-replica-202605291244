@@ -70,7 +70,7 @@
     it.radius = 25 * scaleAt(it.y) * (1 + it.lvl*0.035); if(pop) it.pop=1;
   }
   function makeItem(lvl,x,y,isCurrent=false){
-    return { id:Math.random(), born:performance.now(), lvl, x, y, vx:0, vy:0, radius:30, active:!isCurrent, aim:isCurrent, norm:0, dead:false, frozen:false, mergeLock:0, spin:0, angle:0, pop:0 };
+    return { id:Math.random(), born:performance.now(), lvl, x, y, lockedX:x, lockedY:y, vx:0, vy:0, radius:30, active:!isCurrent, aim:isCurrent, norm:0, dead:false, frozen:false, mergeLock:0, spin:0, angle:0, pop:0 };
   }
 
   function pointerPos(e){
@@ -109,7 +109,10 @@
     state.displayCoins += (state.coins-state.displayCoins) * Math.min(1, dt*5);
     for(const it of state.items){
       if(it.dead) continue;
-      it.mergeLock=Math.max(0,it.mergeLock-dt); it.pop=Math.max(0,it.pop-dt*4); it.angle = 0;
+      it.mergeLock=Math.max(0,it.mergeLock-dt); it.pop=Math.max(0,it.pop-dt*4); it.angle = 0; it.spin = 0;
+      if(it.frozen){
+        it.x=it.lockedX; it.y=it.lockedY; it.vx=0; it.vy=0;
+      }
       if(it.active && !it.frozen){
         it.x += it.vx*dt; it.y += it.vy*dt;
         it.vx *= Math.pow(.10, dt); it.vy *= Math.pow(.18, dt);
@@ -153,12 +156,11 @@
       }
       if(d>0 && d<touch){
         const nx=dx/d, ny=dy/d, push=(touch-d)*.42;
-        if(a.frozen && b.frozen){
-          // Both are locked merge results; never separate them by physics.
-        } else if(a.frozen){
-          b.x+=nx*push*1.8; b.y+=ny*push*1.8; b.vx=0; b.vy=0;
-        } else if(b.frozen){
-          a.x-=nx*push*1.8; a.y-=ny*push*1.8; a.vx=0; a.vy=0;
+        if(a.frozen || b.frozen){
+          // Frozen merge products are pinned pieces. Do not move either item here;
+          // otherwise the merged cup visually slides after creation.
+          if(!a.frozen){ a.vx=0; a.vy=0; }
+          if(!b.frozen){ b.vx=0; b.vy=0; }
         } else {
           a.x-=nx*push; a.y-=ny*push; b.x+=nx*push; b.y+=ny*push;
           const tx=a.vx, ty=a.vy; a.vx=b.vx*.68; a.vy=b.vy*.68; b.vx=tx*.68; b.vy=ty*.68;
@@ -173,6 +175,7 @@
     const n=makeItem(lvl,x,y);
     // Merge result must be born exactly at the contact midpoint and stay stable.
     // Do not inherit velocity, add bounce, or slide forward after merging.
+    n.lockedX=x; n.lockedY=y;
     n.vx=0; n.vy=0; n.spin=0; n.angle=0; n.active=false; n.frozen=true; n.mergeLock=.35; n.pop=1;
     state.items.push(n);
     if((old===6 && state.orderIndex===0) || (old===8 && state.orderIndex===1)) completeOrder(n);
