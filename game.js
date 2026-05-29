@@ -44,8 +44,8 @@
     table.top = h*0.305;
     table.bottom = h*0.865;
     table.launchY = h*0.775;
-    table.leftBottom = w*.000; table.rightBottom = w*1.000;
-    table.leftTop = w*.270; table.rightTop = w*.730;
+    table.leftBottom = w*.085; table.rightBottom = w*.915;
+    table.leftTop = w*.265; table.rightTop = w*.735;
   }
 
   function xBoundsAt(y){
@@ -225,7 +225,7 @@
 
   function draw(){
     const w=state.w,h=state.h; ctx.clearRect(0,0,w,h);
-    drawBeach(); drawTable(); drawBenches(); drawHUD(); drawQueue();
+    drawBeach(); drawBenches(); drawTable(); drawHUD(); drawQueue();
     const items=[...state.items].sort((a,b)=>a.y-b.y);
     for(const it of items) drawItem(it);
     drawParticles(); drawFloating(); drawHand();
@@ -259,32 +259,36 @@
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
   function drawBenches(){
     const w=state.w,h=state.h;
-    // Long, narrow rear-side benches: environmental props, aligned with the tray perspective.
+    // Side benches sit below/behind the tray. Only the outside parts are visible beside the table.
     ctx.save();
     function sideBench(left){
-      const y1=h*.335, y2=h*.620;
-      const nearW=w*.130, farW=w*.080;
-      const xNear = left ? -w*.055 : w*1.055-nearW;
-      const xFar = left ? w*.000 : w*1.000-farW;
+      const y1=h*.405, y2=h*.700;
+      const farW=w*.120, nearW=w*.165;
+      const xFar = left ? -w*.055 : w*1.055-farW;
+      const xNear = left ? -w*.090 : w*1.090-nearW;
       const g=ctx.createLinearGradient(0,y1,0,y2);
-      g.addColorStop(0,'#efd09a'); g.addColorStop(.58,'#d4a365'); g.addColorStop(1,'#a87542');
-      ctx.globalAlpha=.88; ctx.fillStyle=g; ctx.strokeStyle='rgba(124,78,36,.58)'; ctx.lineWidth=2.2;
+      g.addColorStop(0,'#f3d7a5'); g.addColorStop(.55,'#d7a66a'); g.addColorStop(1,'#a97543');
+      ctx.globalAlpha=.82;
+      ctx.fillStyle=g; ctx.strokeStyle='rgba(112,72,38,.55)'; ctx.lineWidth=2;
       ctx.beginPath();
-      ctx.moveTo(xFar,y1); ctx.lineTo(xFar+farW,y1+2); ctx.lineTo(xNear+nearW,y2); ctx.lineTo(xNear,y2-2); ctx.closePath();
+      ctx.moveTo(xFar,y1); ctx.lineTo(xFar+farW,y1+2); ctx.lineTo(xNear+nearW,y2); ctx.lineTo(xNear,y2-4); ctx.closePath();
       ctx.fill(); ctx.stroke();
       ctx.save(); ctx.clip();
-      ctx.strokeStyle='rgba(255,230,172,.34)'; ctx.lineWidth=2;
-      for(let i=0;i<3;i++){ const t=(i+1)/4; ctx.beginPath(); ctx.moveTo(lerp(xFar,xNear,t)+farW*.22,y1+8); ctx.lineTo(lerp(xFar,xNear,t)+nearW*.22,y2-8); ctx.stroke(); }
-      ctx.strokeStyle='rgba(94,58,27,.25)'; ctx.lineWidth=1.5;
-      for(let i=0;i<4;i++){ const y=lerp(y1+14,y2-14,i/3); ctx.beginPath(); ctx.moveTo(lerp(xFar,xNear,(y-y1)/(y2-y1))+5,y); ctx.lineTo(lerp(xFar+farW,xNear+nearW,(y-y1)/(y2-y1))-5,y+3); ctx.stroke(); }
+      ctx.strokeStyle='rgba(255,232,182,.34)'; ctx.lineWidth=2;
+      for(let i=0;i<4;i++){ const t=(i+1)/5; ctx.beginPath(); ctx.moveTo(lerp(xFar,xNear,t)+farW*.18,y1+10); ctx.lineTo(lerp(xFar,xNear,t)+nearW*.22,y2-12); ctx.stroke(); }
+      ctx.strokeStyle='rgba(101,64,33,.24)'; ctx.lineWidth=1.4;
+      for(let i=0;i<4;i++){ const yy=lerp(y1+20,y2-24,i/3), tt=(yy-y1)/(y2-y1); ctx.beginPath(); ctx.moveTo(lerp(xFar,xNear,tt)+6,yy); ctx.lineTo(lerp(xFar+farW,xNear+nearW,tt)-6,yy+4); ctx.stroke(); }
       ctx.restore();
-      // Two small legs, tucked behind the tray line.
-      ctx.fillStyle='rgba(112,66,31,.82)';
-      const lx1=left?xNear+nearW*.18:xNear+nearW*.62, lx2=left?xNear+nearW*.62:xNear+nearW*.20;
-      roundRect(lx1,y2-8,9,h*.052,4,true); roundRect(lx2,y2-18,9,h*.046,4,true);
+      // Outer face/legs below the plank, partly occluded by bottom UI and tray edge.
+      ctx.fillStyle='rgba(115,69,34,.68)';
+      const sx=left?xNear:xNear+nearW-10;
+      roundRect(sx,y1+18,10,y2-y1+18,4,true);
+      ctx.fillStyle='rgba(90,54,30,.78)';
+      roundRect(left?xNear+nearW*.20:xNear+nearW*.66,y2-4,10,h*.065,5,true);
+      roundRect(left?xNear+nearW*.66:xNear+nearW*.24,y2-24,10,h*.055,5,true);
+      ctx.globalAlpha=.18; ctx.fillStyle='#4b2e1a'; ctx.beginPath(); ctx.ellipse(xNear+nearW*.50,y2+h*.055,nearW*.42,8,0,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
     }
     sideBench(true); sideBench(false);
-    ctx.globalAlpha=1;
     ctx.restore();
   }
     function drawShell(x,y,s=1,rot=0){
@@ -323,9 +327,9 @@
 
     // Outer heavy wood slab with bevel/cut corners.
     ctx.beginPath();
-    ctx.moveTo(topL-48,table.top-30); ctx.lineTo(topR+48,table.top-30);
-    ctx.lineTo(botR+64,table.bottom+40); ctx.lineTo(botR+28,table.bottom+62);
-    ctx.lineTo(botL-28,table.bottom+62); ctx.lineTo(botL-64,table.bottom+40);
+    ctx.moveTo(topL-46,table.top-30); ctx.lineTo(topR+46,table.top-30);
+    ctx.lineTo(botR+44,table.bottom+40); ctx.lineTo(botR+24,table.bottom+62);
+    ctx.lineTo(botL-24,table.bottom+62); ctx.lineTo(botL-44,table.bottom+40);
     ctx.closePath();
     const outer=ctx.createLinearGradient(0,table.top-42,0,table.bottom+76);
     outer.addColorStop(0,'#f7deb0'); outer.addColorStop(.42,'#e8c184'); outer.addColorStop(.78,'#cfa06a'); outer.addColorStop(1,'#9f6b3b');
@@ -343,7 +347,7 @@
     ctx.globalAlpha=1;
     // Darker side faces make the wooden frame read as a 3D object.
     ctx.save();
-    ctx.fillStyle='rgba(112,75,39,.25)';
+    ctx.fillStyle='rgba(112,75,39,.34)';
     ctx.beginPath(); ctx.moveTo(topL-44,table.top-24); ctx.lineTo(topL-18,table.top-2); ctx.lineTo(botL-22,table.bottom+32); ctx.lineTo(botL-54,table.bottom+32); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.moveTo(topR+44,table.top-24); ctx.lineTo(topR+18,table.top-2); ctx.lineTo(botR+22,table.bottom+32); ctx.lineTo(botR+54,table.bottom+32); ctx.closePath(); ctx.fill();
     ctx.restore();
@@ -352,6 +356,13 @@
     ctx.fillStyle='rgba(95,54,26,.22)';
     roundRect(botL+96,table.bottom+42,34,h*.040,9,true);
     roundRect(botR-130,table.bottom+42,34,h*.040,9,true);
+    ctx.restore();
+
+    // Side cast shadows help benches read as below the tabletop, not pasted on top.
+    ctx.save();
+    ctx.fillStyle='rgba(79,49,25,.16)';
+    ctx.beginPath(); ctx.moveTo(topL-42,table.top-8); ctx.lineTo(topL-8,table.top+4); ctx.lineTo(botL-18,table.bottom+24); ctx.lineTo(botL-48,table.bottom+30); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(topR+42,table.top-8); ctx.lineTo(topR+8,table.top+4); ctx.lineTo(botR+18,table.bottom+24); ctx.lineTo(botR+48,table.bottom+30); ctx.closePath(); ctx.fill();
     ctx.restore();
 
     // Inner lighter bevel, separated from the glass inset.
@@ -366,7 +377,7 @@
     ctx.restore();
 
     // Inset glass/sand tabletop with visible margin from the wooden frame.
-    const iTopL=topL+7, iTopR=topR-7, iBotL=botL+12, iBotR=botR-12, iTop=table.top+22, iBot=table.bottom-26;
+    const iTopL=topL+9, iTopR=topR-9, iBotL=botL+16, iBotR=botR-16, iTop=table.top+23, iBot=table.bottom-30;
     const sand=ctx.createLinearGradient(0,iTop,0,iBot);
     sand.addColorStop(0,'rgba(230,241,217,.44)'); sand.addColorStop(.32,'rgba(255,241,192,.84)'); sand.addColorStop(.72,'rgba(246,222,158,.86)'); sand.addColorStop(1,'rgba(233,199,128,.82)');
     ctx.beginPath(); ctx.moveTo(iTopL+14,iTop); ctx.lineTo(iTopR-14,iTop); ctx.quadraticCurveTo(iTopR,iTop,iTopR+2,iTop+14); ctx.lineTo(iBotR-2,iBot-16); ctx.quadraticCurveTo(iBotR,iBot,iBotR-16,iBot); ctx.lineTo(iBotL+16,iBot); ctx.quadraticCurveTo(iBotL,iBot,iBotL+2,iBot-16); ctx.lineTo(iTopL-2,iTop+14); ctx.quadraticCurveTo(iTopL,iTop,iTopL+14,iTop); ctx.closePath();
@@ -415,8 +426,8 @@
     rail.addColorStop(0,'rgba(246,211,153,.92)'); rail.addColorStop(.55,'rgba(198,138,78,.88)'); rail.addColorStop(1,'rgba(128,82,42,.86)');
     ctx.fillStyle=rail; ctx.strokeStyle='rgba(104,67,34,.58)'; ctx.lineWidth=3;
     ctx.beginPath();
-    ctx.moveTo(botL-20,table.bottom-8); ctx.lineTo(botR+20,table.bottom-8);
-    ctx.lineTo(botR+44,table.bottom+46); ctx.lineTo(botL-44,table.bottom+46); ctx.closePath();
+    ctx.moveTo(botL-12,table.bottom-6); ctx.lineTo(botR+12,table.bottom-6);
+    ctx.lineTo(botR+38,table.bottom+44); ctx.lineTo(botL-38,table.bottom+44); ctx.closePath();
     ctx.fill(); ctx.stroke();
     ctx.globalAlpha=.24; ctx.strokeStyle='#ffe7b0'; ctx.lineWidth=3;
     ctx.beginPath(); ctx.moveTo(botL-4,table.bottom+4); ctx.lineTo(botR+4,table.bottom+4); ctx.stroke();
