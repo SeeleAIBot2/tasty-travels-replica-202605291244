@@ -303,53 +303,63 @@
   }
   function drawCanopy(){
     const w=state.w,h=state.h; ctx.save();
-    const y=h*.024;
-    // Solid wooden support reads as a real drink-stand beam, not a flat strip.
-    const backBeam=ctx.createLinearGradient(0,y+h*.010,0,y+h*.064);
-    backBeam.addColorStop(0,'#c48743'); backBeam.addColorStop(.45,'#8e5528'); backBeam.addColorStop(1,'#603516');
-    ctx.fillStyle=backBeam; ctx.fillRect(-8,y+h*.030,w+16,h*.040);
-    ctx.fillStyle='rgba(70,38,15,.28)'; ctx.fillRect(-8,y+h*.066,w+16,h*.014);
-    ctx.strokeStyle='rgba(255,207,121,.28)'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(0,y+h*.037); ctx.lineTo(w,y+h*.037); ctx.stroke();
-    // short lashings / knots break the repeated texture feeling.
-    ctx.strokeStyle='rgba(72,42,18,.26)'; ctx.lineWidth=2;
-    for(let x=-10;x<w+20;x+=58){ ctx.beginPath(); ctx.moveTo(x,y+h*.031); ctx.quadraticCurveTo(x+15,y+h*.060,x+35,y+h*.034); ctx.stroke(); }
+    const y=h*.018;
+    // Dense tropical thatch roof: broad back mass + darker front eave, not sparse hanging strips.
+    const roofTop=ctx.createLinearGradient(0,y,0,y+h*.090);
+    roofTop.addColorStop(0,'#f5d878'); roofTop.addColorStop(.36,'#d3ad4e'); roofTop.addColorStop(.78,'#9a7330'); roofTop.addColorStop(1,'#6f4d21');
+    ctx.fillStyle=roofTop;
+    ctx.beginPath();
+    ctx.moveTo(-20,y+h*.020);
+    ctx.bezierCurveTo(w*.22,y+h*.002,w*.78,y+h*.002,w+20,y+h*.020);
+    ctx.lineTo(w+24,y+h*.102);
+    ctx.bezierCurveTo(w*.72,y+h*.082,w*.28,y+h*.082,-24,y+h*.102);
+    ctx.closePath(); ctx.fill();
 
-    function strawPatch(x0,row,wid,drop,tilt,alpha){
-      const top=y+h*(.012+row*.025);
-      const grad=ctx.createLinearGradient(0,top,0,top+drop);
-      grad.addColorStop(0,'rgba(245,221,128,'+alpha+')');
-      grad.addColorStop(.42,'rgba(198,165,72,'+(alpha*.96)+')');
-      grad.addColorStop(1,'rgba(119,91,40,'+(alpha*.72)+')');
-      ctx.fillStyle=grad;
-      ctx.beginPath();
-      ctx.moveTo(x0,top);
-      ctx.bezierCurveTo(x0+wid*.25+tilt,top+drop*.32,x0+wid*.42-tilt,top+drop*.76,x0+wid*.52,top+drop);
-      ctx.bezierCurveTo(x0+wid*.70,top+drop*.70,x0+wid*.90,top+drop*.32,x0+wid,top+2);
-      ctx.quadraticCurveTo(x0+wid*.48,top+drop*.12,x0,top); ctx.fill();
-      // fine straw fibers inside each clump: natural, curved, irregular.
-      ctx.strokeStyle='rgba(92,70,28,'+(alpha*.34)+')'; ctx.lineWidth=1;
-      const fibers=3+(row%2);
-      for(let k=1;k<=fibers;k++){
-        const xx=x0+wid*(k/(fibers+1));
-        ctx.beginPath(); ctx.moveTo(xx,top+2);
-        ctx.bezierCurveTo(xx+tilt*.15,top+drop*.35,xx-tilt*.10,top+drop*.62,xx+Math.sin(k+x0)*4,top+drop*(.82+.04*(k%2)));
-        ctx.stroke();
+    // Real wooden beam under the thatch, partially hidden by straw.
+    const beam=ctx.createLinearGradient(0,y+h*.060,0,y+h*.104);
+    beam.addColorStop(0,'#b87334'); beam.addColorStop(.55,'#815025'); beam.addColorStop(1,'#5b3217');
+    ctx.fillStyle=beam; ctx.fillRect(-12,y+h*.066,w+24,h*.034);
+    ctx.fillStyle='rgba(55,31,13,.28)'; ctx.fillRect(-12,y+h*.096,w+24,h*.014);
+    ctx.strokeStyle='rgba(255,211,126,.20)'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(0,y+h*.074); ctx.lineTo(w,y+h*.074); ctx.stroke();
+
+    function thatchLayer(row, count, topOffset, minDrop, maxDrop, alpha, dark){
+      for(let i=0;i<count;i++){
+        const t=i/(count-1), x=lerp(-34,w+34,t)+Math.sin(i*1.9+row)*7;
+        const width=30+(i*13+row*7)%24;
+        const drop=h*(minDrop+(((i*17+row*11)%100)/100)*(maxDrop-minDrop));
+        const top=y+h*topOffset+Math.sin(i*.8)*4;
+        const grad=ctx.createLinearGradient(0,top,0,top+drop);
+        grad.addColorStop(0, dark?`rgba(214,174,73,${alpha})`:`rgba(250,226,130,${alpha})`);
+        grad.addColorStop(.46,`rgba(184,145,58,${alpha*.95})`);
+        grad.addColorStop(1,`rgba(92,66,28,${alpha*.74})`);
+        ctx.fillStyle=grad;
+        ctx.beginPath();
+        ctx.moveTo(x-width*.52,top);
+        ctx.bezierCurveTo(x-width*.20,top+drop*.22,x-width*.24,top+drop*.62,x+Math.sin(i)*5,top+drop);
+        ctx.bezierCurveTo(x+width*.24,top+drop*.60,x+width*.20,top+drop*.24,x+width*.52,top);
+        ctx.quadraticCurveTo(x,top+drop*.10,x-width*.52,top); ctx.fill();
+        // packed straw fibers on each lock
+        ctx.strokeStyle=`rgba(86,63,25,${alpha*.34})`; ctx.lineWidth=.8;
+        for(let k=0;k<4;k++){
+          const fx=x-width*.28+k*width*.18+Math.sin(i+k)*2;
+          ctx.beginPath(); ctx.moveTo(fx,top+3);
+          ctx.bezierCurveTo(fx+Math.sin(k+i)*4,top+drop*.35,fx-Math.cos(i)*3,top+drop*.72,fx+Math.sin(i*k+1)*5,top+drop*.94);
+          ctx.stroke();
+        }
       }
     }
-    // Back layer: broad soft thatch mass.
-    ctx.globalAlpha=.72;
-    for(let i=0;i<12;i++) strawPatch(-24+i*38,0,42+(i%3)*8,h*(.072+(i%4)*.010),Math.sin(i)*6,.58);
-    // Middle and front layers: longer, denser, non-repeating clumps.
-    ctx.globalAlpha=.88;
-    for(let i=0;i<15;i++) strawPatch(-32+i*31,1,34+(i%5)*7,h*(.088+((i*7)%5)*.012),Math.cos(i*.8)*8,.70);
-    ctx.globalAlpha=.68;
-    for(let i=0;i<10;i++) strawPatch(-18+i*48,2,44+(i%4)*10,h*(.060+((i*5)%4)*.016),Math.sin(i*1.4)*10,.52);
-    ctx.globalAlpha=1;
-    // Underside occlusion gives thickness, while the top remains bright and summery.
-    const shade=ctx.createLinearGradient(0,y+h*.084,0,y+h*.142);
-    shade.addColorStop(0,'rgba(91,58,22,.14)'); shade.addColorStop(1,'rgba(55,34,14,0)');
-    ctx.fillStyle=shade; ctx.fillRect(0,y+h*.080,w,h*.070);
-    ctx.fillStyle='rgba(255,238,164,.16)'; ctx.fillRect(0,y+h*.020,w,h*.012);
+    // Back layer fills width and gives the roof body.
+    thatchLayer(0,22,.026,.070,.115,.58,false);
+    // Middle layer: denser, varied, covers gaps.
+    thatchLayer(1,28,.048,.090,.155,.76,false);
+    // Front eave: darker and lower, creating foreground depth and underside shadow.
+    thatchLayer(2,24,.076,.070,.130,.82,true);
+
+    const underside=ctx.createLinearGradient(0,y+h*.092,0,y+h*.185);
+    underside.addColorStop(0,'rgba(68,42,17,.28)'); underside.addColorStop(.55,'rgba(68,42,17,.12)'); underside.addColorStop(1,'rgba(68,42,17,0)');
+    ctx.fillStyle=underside; ctx.fillRect(0,y+h*.086,w,h*.110);
+    // Top sun wash keeps the material warm and beach-like.
+    ctx.fillStyle='rgba(255,239,156,.14)'; ctx.fillRect(0,y+h*.020,w,h*.018);
     ctx.restore();
   }
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
