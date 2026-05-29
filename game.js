@@ -256,22 +256,40 @@
   }
   function drawPalm(x,y,s,flip){
     ctx.save(); ctx.translate(x,y); ctx.scale(s*flip,s);
-    ctx.save(); ctx.rotate(-.12);
-    const trunk=ctx.createLinearGradient(-8,0,10,160); trunk.addColorStop(0,'#b87948'); trunk.addColorStop(.55,'#8d5a36'); trunk.addColorStop(1,'#6d4228');
-    ctx.fillStyle=trunk; roundRect(-9,-8,18,170,8,true);
-    ctx.strokeStyle='rgba(89,49,25,.30)'; ctx.lineWidth=2;
-    for(let i=0;i<7;i++){ ctx.beginPath(); ctx.moveTo(-8,12+i*22); ctx.lineTo(8,5+i*22); ctx.stroke(); }
+    // Curved, segmented trunk with side highlight and ground shadow so the tree
+    // reads as an environment object instead of a flat sticker.
+    ctx.save(); ctx.rotate(-.10);
+    ctx.fillStyle='rgba(80,48,24,.16)'; ctx.beginPath(); ctx.ellipse(5,164,36,10,0,0,Math.PI*2); ctx.fill();
+    const trunk=ctx.createLinearGradient(-10,0,14,160);
+    trunk.addColorStop(0,'#c98d55'); trunk.addColorStop(.44,'#9b6339'); trunk.addColorStop(1,'#704328');
+    ctx.fillStyle=trunk;
+    ctx.beginPath();
+    ctx.moveTo(-10,158); ctx.bezierCurveTo(-6,118,-2,66,-7,-8);
+    ctx.bezierCurveTo(-1,-16,12,-13,15,-4);
+    ctx.bezierCurveTo(8,62,13,116,10,158);
+    ctx.quadraticCurveTo(0,166,-10,158); ctx.fill();
+    ctx.strokeStyle='rgba(82,45,23,.28)'; ctx.lineWidth=2;
+    for(let i=0;i<8;i++){ const yy=10+i*18; ctx.beginPath(); ctx.moveTo(-8+Math.sin(i)*2,yy+5); ctx.quadraticCurveTo(1,yy-2,11,yy+2); ctx.stroke(); }
+    ctx.strokeStyle='rgba(255,207,139,.22)'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(5,0); ctx.bezierCurveTo(8,54,8,108,5,150); ctx.stroke();
     ctx.restore();
-    for(let layer=0;layer<2;layer++){
-      ctx.fillStyle=layer?'#2f8f45':'#51b85a';
-      for(let i=-5;i<=5;i++){
-        ctx.save(); ctx.rotate(i*.20+(layer?.11:0));
-        ctx.beginPath(); ctx.moveTo(0,0); ctx.quadraticCurveTo(32,-23-layer*5,72,-7+i*2); ctx.quadraticCurveTo(38,1,0,0); ctx.fill();
-        ctx.strokeStyle='rgba(24,96,48,.22)'; ctx.lineWidth=1.1; ctx.beginPath(); ctx.moveTo(5,-1); ctx.quadraticCurveTo(35,-17-layer*4,68,-6+i*2); ctx.stroke();
-        ctx.restore();
-      }
+
+    function frond(rot,len,w,col,alpha=1){
+      ctx.save(); ctx.rotate(rot); ctx.globalAlpha=alpha; ctx.fillStyle=col;
+      ctx.beginPath(); ctx.moveTo(0,0);
+      ctx.bezierCurveTo(len*.18,-w*1.25,len*.62,-w*.95,len,-w*.15);
+      ctx.bezierCurveTo(len*.58,w*.42,len*.22,w*.28,0,0); ctx.fill();
+      ctx.strokeStyle='rgba(27,95,45,.28)'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(4,-1); ctx.bezierCurveTo(len*.28,-w*.62,len*.66,-w*.42,len*.94,-w*.10); ctx.stroke();
+      ctx.restore();
     }
-    ctx.fillStyle='#3c9349'; ctx.beginPath(); ctx.arc(0,0,16,0,Math.PI*2); ctx.fill();
+    // Back, middle, and front fronds with different lengths/angles create volume.
+    for(const [r,l,wid,a] of [[-1.25,82,18,.58],[-.92,94,17,.68],[-.55,102,18,.78],[-.18,94,17,.72],[.20,88,16,.66]]) frond(r,l,wid,'#2f8f48',a);
+    for(const [r,l,wid] of [[-.72,108,20],[-.35,116,20],[.03,112,19],[.38,98,18],[.72,86,17]]) frond(r,l,wid,'#4eb65a',.88);
+    for(const [r,l,wid] of [[-1.02,72,14],[-.48,88,15],[.18,84,14],[.62,70,13]]) frond(r,l,wid,'#63c76a',.70);
+    ctx.globalAlpha=1;
+    const crown=ctx.createRadialGradient(-4,-3,3,0,0,17); crown.addColorStop(0,'#65bd5c'); crown.addColorStop(1,'#2f8b45');
+    ctx.fillStyle=crown; ctx.beginPath(); ctx.arc(0,0,17,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(113,69,34,.55)'; for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.arc(i*7,10,5,0,Math.PI*2); ctx.fill(); }
     ctx.restore();
   }
   function drawCanopy(){
