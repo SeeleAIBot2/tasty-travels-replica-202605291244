@@ -70,7 +70,7 @@
     it.radius = 25 * scaleAt(it.y) * (1 + it.lvl*0.035); if(pop) it.pop=1;
   }
   function makeItem(lvl,x,y,isCurrent=false){
-    return { id:Math.random(), born:performance.now(), lvl, x, y, vx:0, vy:0, radius:30, active:!isCurrent, aim:isCurrent, norm:0, dead:false, mergeLock:0, spin:(Math.random()-.5)*0.025, angle:0, pop:0 };
+    return { id:Math.random(), born:performance.now(), lvl, x, y, vx:0, vy:0, radius:30, active:!isCurrent, aim:isCurrent, norm:0, dead:false, frozen:false, mergeLock:0, spin:0, angle:0, pop:0 };
   }
 
   function pointerPos(e){
@@ -109,8 +109,8 @@
     state.displayCoins += (state.coins-state.displayCoins) * Math.min(1, dt*5);
     for(const it of state.items){
       if(it.dead) continue;
-      it.mergeLock=Math.max(0,it.mergeLock-dt); it.pop=Math.max(0,it.pop-dt*4); it.angle += it.spin;
-      if(it.active){
+      it.mergeLock=Math.max(0,it.mergeLock-dt); it.pop=Math.max(0,it.pop-dt*4); it.angle = 0;
+      if(it.active && !it.frozen){
         it.x += it.vx*dt; it.y += it.vy*dt;
         it.vx *= Math.pow(.10, dt); it.vy *= Math.pow(.18, dt);
         const b=xBoundsAt(it.y), r=it.radius*.72;
@@ -153,8 +153,16 @@
       }
       if(d>0 && d<touch){
         const nx=dx/d, ny=dy/d, push=(touch-d)*.42;
-        a.x-=nx*push; a.y-=ny*push; b.x+=nx*push; b.y+=ny*push;
-        const tx=a.vx, ty=a.vy; a.vx=b.vx*.68; a.vy=b.vy*.68; b.vx=tx*.68; b.vy=ty*.68;
+        if(a.frozen && b.frozen){
+          // Both are locked merge results; never separate them by physics.
+        } else if(a.frozen){
+          b.x+=nx*push*1.8; b.y+=ny*push*1.8; b.vx=0; b.vy=0;
+        } else if(b.frozen){
+          a.x-=nx*push*1.8; a.y-=ny*push*1.8; a.vx=0; a.vy=0;
+        } else {
+          a.x-=nx*push; a.y-=ny*push; b.x+=nx*push; b.y+=ny*push;
+          const tx=a.vx, ty=a.vy; a.vx=b.vx*.68; a.vy=b.vy*.68; b.vx=tx*.68; b.vy=ty*.68;
+        }
       }
     }
   }
@@ -165,7 +173,7 @@
     const n=makeItem(lvl,x,y);
     // Merge result must be born exactly at the contact midpoint and stay stable.
     // Do not inherit velocity, add bounce, or slide forward after merging.
-    n.vx=0; n.vy=0; n.spin=0; n.angle=0; n.active=true; n.mergeLock=.35; n.pop=1;
+    n.vx=0; n.vy=0; n.spin=0; n.angle=0; n.active=false; n.frozen=true; n.mergeLock=.35; n.pop=1;
     state.items.push(n);
     if((old===6 && state.orderIndex===0) || (old===8 && state.orderIndex===1)) completeOrder(n);
     if(lvl>=9){ state.ended=true; addFloat(state.w/2,state.h*.45,'完成！点击重玩'); }
@@ -251,7 +259,7 @@
   }
   function drawItem(it){
     if(it.aim){ ctx.save(); ctx.translate(it.x,it.y); ctx.rotate(it.norm*.30); ctx.strokeStyle='rgba(255,255,255,.98)'; ctx.lineWidth=5; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,-it.radius*.95); ctx.lineTo(0,-Math.max(150,state.h*.25)); ctx.stroke(); ctx.restore(); }
-    drawDrinkIcon(it.lvl,it.x,it.y,(it.radius/42)*(1+it.pop*.18),it.angle);
+    drawDrinkIcon(it.lvl,it.x,it.y,(it.radius/42)*(1+it.pop*.18),0);
   }
   function drawDrinkIcon(lvl,x,y,s=1,rot=0){
     const d=drinks[lvl]; ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
