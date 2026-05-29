@@ -27,7 +27,8 @@
   const table = { leftBottom:0, rightBottom:0, leftTop:0, rightTop:0, bottom:0, top:0, launchY:0 };
 
   function resize(){
-    state.w = innerWidth; state.h = innerHeight; state.portrait = state.h >= state.w;
+    const r = canvas.getBoundingClientRect();
+    state.w = Math.max(1, r.width); state.h = Math.max(1, r.height); state.portrait = true;
     canvas.width = Math.floor(state.w * DPR); canvas.height = Math.floor(state.h * DPR);
     ctx.setTransform(DPR,0,0,DPR,0,0);
     layoutTable();
@@ -37,12 +38,12 @@
 
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
-    // Reference playable uses a broad glass tabletop with strong vertical perspective.
-    table.top = p ? h*0.29 : h*0.28;
-    table.bottom = p ? h*1.02 : h*1.05;
-    table.launchY = p ? h*0.82 : h*0.79;
-    table.leftBottom = w*(p?.15:.18); table.rightBottom = w*(p?.85:.82);
-    table.leftTop = w*(p?.37:.39); table.rightTop = w*(p?.63:.61);
+    // Locked to the original playable's vertical phone composition.
+    table.top = h*0.31;
+    table.bottom = h*1.01;
+    table.launchY = h*0.83;
+    table.leftBottom = w*.13; table.rightBottom = w*.87;
+    table.leftTop = w*.34; table.rightTop = w*.66;
   }
 
   function xBoundsAt(y){
@@ -73,7 +74,9 @@
   }
 
   function pointerPos(e){
-    const t=e.touches&&e.touches[0]; return {x:t?t.clientX:e.clientX, y:t?t.clientY:e.clientY};
+    const t=e.touches&&e.touches[0];
+    const r=canvas.getBoundingClientRect();
+    return {x:(t?t.clientX:e.clientX)-r.left, y:(t?t.clientY:e.clientY)-r.top};
   }
   function onDown(e){
     if(state.ended){ reset(); return; }
@@ -87,9 +90,9 @@
   function onUp(e){
     if(!state.dragging || !state.current) return; state.dragging=false;
     const it=state.current; it.aim=false; it.active=true;
-    const impulse = 720 * scaleAt(it.y);
-    it.vx = -it.norm * 250;     // 原版：x/256 决定横向反冲
-    it.vy = -impulse;           // 原版松手固定向前冲，不需要拉蓄力
+    const impulse = 770 * scaleAt(it.y);
+    it.vx = -it.norm * 135;     // 更少横向乱飘，主要沿桌面纵深前冲
+    it.vy = -impulse;           // 松手固定向前冲，不做蓄力重设计
     it.mergeLock = .18;
     state.current = null;
     setTimeout(() => { if(!state.current && !state.ended) spawnCurrent(); }, 420);
@@ -109,12 +112,12 @@
       it.mergeLock=Math.max(0,it.mergeLock-dt); it.pop=Math.max(0,it.pop-dt*4); it.angle += it.spin;
       if(it.active){
         it.x += it.vx*dt; it.y += it.vy*dt;
-        it.vx *= Math.pow(.22, dt); it.vy *= Math.pow(.10, dt);
+        it.vx *= Math.pow(.10, dt); it.vy *= Math.pow(.18, dt);
         const b=xBoundsAt(it.y), r=it.radius*.72;
-        if(it.x < b.l+r){ it.x=b.l+r; it.vx=Math.abs(it.vx)*.45; }
-        if(it.x > b.r-r){ it.x=b.r-r; it.vx=-Math.abs(it.vx)*.45; }
-        if(it.y < table.top+30){ it.y=table.top+30; it.vy=Math.abs(it.vy)*.25; }
-        if(it.y > table.bottom-30){ it.y=table.bottom-30; it.vy=-Math.abs(it.vy)*.15; }
+        if(it.x < b.l+r){ it.x=b.l+r; it.vx=Math.abs(it.vx)*.62; }
+        if(it.x > b.r-r){ it.x=b.r-r; it.vx=-Math.abs(it.vx)*.62; }
+        if(it.y < table.top+30){ it.y=table.top+30; it.vy=Math.abs(it.vy)*.38; }
+        if(it.y > table.bottom-30){ it.y=table.bottom-30; it.vy=-Math.abs(it.vy)*.22; }
         if(Math.hypot(it.vx,it.vy)<8){ it.vx=0; it.vy=0; }
       }
       it.radius = 25 * scaleAt(it.y) * (1 + it.lvl*0.035);
@@ -130,12 +133,19 @@
   function collideAndMerge(){
     for(let i=0;i<state.items.length;i++) for(let j=i+1;j<state.items.length;j++){
       const a=state.items[i], b=state.items[j]; if(a.dead||b.dead||a.aim||b.aim) continue;
-      const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy), min=(a.radius+b.radius)*.72;
-      if(d>0 && d<min){
-        const nx=dx/d, ny=dy/d, push=(min-d)*.5;
+      const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy), touch=(a.radius+b.radius)*.82, mergeR=(a.radius+b.radius)*1.02;
+      if(d>0 && a.lvl===b.lvl && a.lvl<9 && !a.mergeLock && !b.mergeLock && d<mergeR){
+        const slow=Math.hypot(a.vx-b.vx,a.vy-b.vy)<520;
+        if(slow || d<touch){
+          a.x=lerp(a.x,(a.x+b.x)/2,.35); a.y=lerp(a.y,(a.y+b.y)/2,.35);
+          b.x=lerp(b.x,(a.x+b.x)/2,.35); b.y=lerp(b.y,(a.y+b.y)/2,.35);
+          merge(a,b); return;
+        }
+      }
+      if(d>0 && d<touch){
+        const nx=dx/d, ny=dy/d, push=(touch-d)*.42;
         a.x-=nx*push; a.y-=ny*push; b.x+=nx*push; b.y+=ny*push;
-        const tx=a.vx, ty=a.vy; a.vx=b.vx*.55; a.vy=b.vy*.55; b.vx=tx*.55; b.vy=ty*.55;
-        if(a.lvl===b.lvl && a.lvl<9 && !a.mergeLock && !b.mergeLock){ merge(a,b); return; }
+        const tx=a.vx, ty=a.vy; a.vx=b.vx*.68; a.vy=b.vy*.68; b.vx=tx*.68; b.vy=ty*.68;
       }
     }
   }
@@ -158,7 +168,7 @@
 
   function draw(){
     const w=state.w,h=state.h; ctx.clearRect(0,0,w,h);
-    drawBeach(); drawTable(); drawHUD(); drawQueue();
+    drawBeach(); drawTable(); drawHUD();
     const items=[...state.items].sort((a,b)=>a.y-b.y);
     for(const it of items) drawItem(it);
     drawParticles(); drawFloating(); drawHand();
@@ -170,7 +180,7 @@
     // sea foam and sand details
     ctx.fillStyle='rgba(255,255,255,.72)'; for(let i=0;i<7;i++){ ctx.beginPath(); ctx.ellipse(w*(-.05+i*.19), h*.40+Math.sin(i*1.7)*9, 74, 8, 0,0,Math.PI*2); ctx.fill(); }
     ctx.fillStyle='rgba(177,122,74,.18)'; for(let i=0;i<12;i++){ ctx.beginPath(); ctx.ellipse((i*97)%w, h*(.63+(i%5)*.07), 13, 8, .5, 0, Math.PI*2); ctx.fill(); }
-    drawPalm(w*.16,h*.27,.9,-1); drawPalm(w*.82,h*.27,.88,1); drawCanopy(); drawPosts(); drawBenches();
+    drawPalm(w*.12,h*.29,.72,-1); drawPalm(w*.88,h*.29,.70,1); drawCanopy();
   }
   function drawPalm(x,y,s,flip){ ctx.save(); ctx.translate(x,y); ctx.scale(s*flip,s); ctx.fillStyle='#96633d'; ctx.rotate(-.12); roundRect(-9,-8,18,170,8,true); ctx.rotate(.12); ctx.fillStyle='#49aa52'; for(let i=-3;i<=3;i++){ ctx.save(); ctx.rotate(i*.34); ctx.beginPath(); ctx.ellipse(40,-10,64,17,0,0,Math.PI*2); ctx.fill(); ctx.restore(); } ctx.fillStyle='#3c9349'; ctx.beginPath(); ctx.arc(0,0,18,0,Math.PI*2); ctx.fill(); ctx.restore(); }
   function drawCanopy(){ const w=state.w,h=state.h; ctx.save(); ctx.fillStyle='#8c5a32'; ctx.fillRect(0,h*.05,w,h*.04); ctx.fillStyle='#84a83a'; for(let x=-30;x<w+40;x+=48){ ctx.beginPath(); ctx.moveTo(x,h*.04); ctx.quadraticCurveTo(x+24,h*.16,x+52,h*.04); ctx.closePath(); ctx.fill(); } ctx.fillStyle='#6d8b30'; for(let x=-20;x<w+40;x+=64){ ctx.beginPath(); ctx.ellipse(x,h*.065,58,18,.15,0,Math.PI*2); ctx.fill(); } ctx.restore(); }
@@ -189,15 +199,16 @@
   }
   function drawHUD(){
     const p=state.portrait, w=state.w, h=state.h;
-    const ox=p?w*.18:w*.33, oy=p?h*.075:h*.06;
-    drawOrder(ox,oy,state.orders[0],0); drawOrder(ox+(p?112:126),oy+8,state.orders[1],1);
-    const cx=p?w*.76:w*.84, cy=p?h*.055:h*.05;
-    ctx.fillStyle='rgba(0,0,0,.22)'; roundRect(cx-35,cy-18,88,36,18,true); drawCoin(cx-20,cy,13); text(Math.round(state.displayCoins),cx+7,cy+6,20,'#fff','left','bold');
-    roundRect(cx-45,cy+38,92,90,14,true,'rgba(255,245,210,.92)','#6b3f22',3); text('下一個',cx,cy+58,16,'#7b3e22','center','bold'); drawDrinkIcon(state.seq[state.seqIndex%state.seq.length],cx,cy+96,.68);
+    const coinX=w*.14, coinY=h*.055;
+    ctx.fillStyle='rgba(0,0,0,.25)'; roundRect(coinX-34,coinY-17,86,34,17,true); drawCoin(coinX-18,coinY,12); text(Math.round(state.displayCoins),coinX+6,coinY+5,19,'#fff','left','bold');
+    const ox=w*.22, oy=h*.155;
+    drawOrder(ox,oy,state.orders[0],0); drawOrder(ox+82,oy+7,state.orders[1],1);
+    const nx=w*.82, ny=h*.075;
+    roundRect(nx-33,ny+20,66,74,12,true,'rgba(255,245,210,.86)','#6b3f22',2); text('NEXT',nx,ny+38,12,'#7b3e22','center','bold'); drawDrinkIcon(state.seq[state.seqIndex%state.seq.length],nx,ny+72,.50);
   }
   function drawOrder(x,y,o,i){
     const active=i>=state.orderIndex && !o.done, a=o.done?.45:(active?1:.6); ctx.save(); ctx.globalAlpha=a; ctx.rotate(Math.sin(state.handT+i)*.015);
-    roundRect(x-48,y-36,96,98,12,true,'#fff8df','#a85828',3); text('外帶訂單',x,y-14,13,'#8b3d23','center','bold'); drawDrinkIcon(o.lvl,x,y+18,.48); text(o.reward,x+10,y+52,18,'#6b381e','left','bold'); drawCoin(x-16,y+46,10); if(o.done){ text('✓',x,y+26,48,'#3ac56b','center','bold'); } ctx.restore();
+    roundRect(x-36,y-28,72,74,10,true,'#fff8df','#a85828',2); text('ORDER',x,y-11,10,'#8b3d23','center','bold'); drawDrinkIcon(o.lvl,x,y+14,.36); text(o.reward,x+7,y+39,14,'#6b381e','left','bold'); drawCoin(x-13,y+35,8); if(o.done){ text('✓',x,y+16,38,'#3ac56b','center','bold'); } ctx.restore();
   }
   function drawQueue(){
     const x=state.portrait?state.w*.09:state.w*.09, y0=state.h*.20, gap=state.portrait?34:30;
