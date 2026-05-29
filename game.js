@@ -21,7 +21,7 @@
   const state = {
     w: 0, h: 0, portrait: true, coins: 0, displayCoins: 0,
     items: [], particles: [], floating: [], current: null,
-    seq: testOrders ? [0,0,1,1,0,0,1,1,2,2,2,2] : [], seqIndex:0, nextLvl:0,
+    seq: testOrders ? [0,0,1,1,0,0,1,1,2,2,2,2] : [], seqIndex:0, nextLvl:0, highestUnlocked:0,
     orders: testOrders ? [{lvl:1, reward:120, done:false}, {lvl:2, reward:180, done:false}] : [{lvl:6, reward:500, done:false}, {lvl:8, reward:600, done:false}],
     orderIndex:0, dragging:false, pointerX:0, handT:0, ended:false
   };
@@ -63,12 +63,13 @@
 
   function rollSpawnLevel(){
     if(testOrders) return state.seq[state.seqIndex++ % state.seq.length];
-    const r=Math.random();
-    // Merge-game material generator: only low-tier drinks enter from the system.
-    // High tiers must be earned through player merges, not handed out in sequence.
-    if(r<.70) return 0;      // 70% level 1
-    if(r<.95) return 1;      // 25% level 2
-    return 2;                // 5% level 3
+    // Strict merge-game spawn pool:
+    // - Never direct-spawn level 3+ drinks.
+    // - Level 2 only appears after enough progress, and stays rare.
+    // - Any spawned level must be <= highest unlocked level - 2.
+    const maxByProgress = clamp(state.highestUnlocked - 2, 0, 1);
+    if(maxByProgress < 1) return 0;       // early game: only level 1
+    return Math.random() < .90 ? 0 : 1;   // progressed pool: 90% level 1, 10% level 2
   }
   function spawnCurrent(){
     const lvl = state.nextLvl ?? rollSpawnLevel();
@@ -219,6 +220,7 @@
     // Do not inherit velocity, add bounce, or slide forward after merging.
     n.lockedX=x; n.lockedY=y;
     n.vx=0; n.vy=0; n.spin=0; n.angle=0; n.active=false; n.frozen=true; n.mergeLock=.22; n.pop=1;
+    state.highestUnlocked = Math.max(state.highestUnlocked, lvl);
     state.items.push(n);
     const targetOrder=state.orders[state.orderIndex];
     if(targetOrder && lvl>=targetOrder.lvl) completeOrder(n);
@@ -585,7 +587,7 @@
   function roundRect(x,y,w,h,r,fill=true,fs,ss,lw){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); if(fs) ctx.fillStyle=fs; if(fill) ctx.fill(); if(ss){ ctx.strokeStyle=ss; ctx.lineWidth=lw||1; ctx.stroke(); } }
   function text(str,x,y,size,color,align='left',weight='',stroke){ ctx.save(); ctx.font=`${weight} ${size}px Arial`; ctx.textAlign=align; ctx.textBaseline='middle'; if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=5; for(const [k,line] of String(str).split('\n').entries()) ctx.strokeText(line,x,y+k*size*1.05); } ctx.fillStyle=color; for(const [k,line] of String(str).split('\n').entries()) ctx.fillText(line,x,y+k*size*1.05); ctx.restore(); }
 
-  function reset(){ state.items=[]; state.particles=[]; state.floating=[]; state.coins=0; state.displayCoins=0; state.seqIndex=0; state.nextLvl=rollSpawnLevel(); state.orderIndex=0; state.ended=false; state.orders.forEach(o=>o.done=false); spawnCurrent(); }
+  function reset(){ state.items=[]; state.particles=[]; state.floating=[]; state.coins=0; state.displayCoins=0; state.seqIndex=0; state.highestUnlocked=0; state.nextLvl=rollSpawnLevel(); state.orderIndex=0; state.ended=false; state.orders.forEach(o=>o.done=false); spawnCurrent(); }
   let last=performance.now(); function loop(now){ const dt=Math.min(.033,(now-last)/1000); last=now; update(dt); draw(); requestAnimationFrame(loop); }
   resize(); reset(); requestAnimationFrame(loop);
 })();
