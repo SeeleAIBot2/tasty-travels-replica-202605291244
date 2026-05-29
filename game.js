@@ -244,42 +244,34 @@
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
   function drawBenches(){
     const w=state.w,h=state.h;
-    const topY=lerp(table.top,table.bottom,.28), botY=table.bottom+18;
-    const lTop=xBoundsAt(topY).l-18, lBot=xBoundsAt(table.bottom).l-10;
-    const rTop=xBoundsAt(topY).r+18, rBot=xBoundsAt(table.bottom).r+10;
+    // Reference-style side benches: low horizontal wooden seats, partially hidden by the table.
+    const y=h*.565, bh=h*.245;
     ctx.save();
-    function sideBench(left){
-      const outerTop=left?-10:w+10, outerBot=left?-14:w+14;
-      const innerTop=left?lTop:rTop, innerBot=left?lBot:rBot;
-      const g=ctx.createLinearGradient(0,topY,0,botY);
-      g.addColorStop(0,'#e0b377'); g.addColorStop(.56,'#c99051'); g.addColorStop(1,'#9f6534');
-      ctx.fillStyle=g; ctx.strokeStyle='#8b5b31'; ctx.lineWidth=3;
-      ctx.beginPath();
-      ctx.moveTo(outerTop,topY+8); ctx.lineTo(innerTop,topY); ctx.lineTo(innerBot,botY); ctx.lineTo(outerBot,botY+22); ctx.closePath();
-      ctx.fill(); ctx.stroke();
-      // top highlight surface
-      ctx.fillStyle='rgba(255,226,166,.30)';
-      ctx.beginPath();
-      ctx.moveTo(left?10:innerTop+(outerTop-innerTop)*.22, topY+20);
-      ctx.lineTo(left?innerTop-12:w-10, topY+12);
-      ctx.lineTo(left?innerBot-10:w-10, botY-18);
-      ctx.lineTo(left?10:innerBot+(outerBot-innerBot)*.18, botY-6);
-      ctx.closePath(); ctx.fill();
-      // plank lines following table perspective
-      ctx.strokeStyle='rgba(100,65,34,.34)'; ctx.lineWidth=2;
+    function lowBench(left){
+      const x = left ? -w*.02 : w*.835;
+      const bw = w*.185;
+      const g=ctx.createLinearGradient(0,y,0,y+bh);
+      g.addColorStop(0,'#dfb173');
+      g.addColorStop(.55,'#c89150');
+      g.addColorStop(1,'#9d6536');
+      ctx.fillStyle=g; ctx.strokeStyle='#8a5a31'; ctx.lineWidth=3;
+      // Seat top is a short plank, not a tall side wall.
+      roundRect(x,y,bw,bh,7,true); ctx.stroke();
+      ctx.fillStyle='rgba(255,226,166,.32)';
+      roundRect(x+bw*.18,y+10,bw*.58,bh-20,5,true);
+      ctx.strokeStyle='rgba(104,67,35,.34)'; ctx.lineWidth=2;
       for(let i=1;i<=3;i++){
-        const t=i/4;
-        ctx.beginPath();
-        ctx.moveTo(lerp(outerTop,innerTop,t),topY+12);
-        ctx.lineTo(lerp(outerBot,innerBot,t),botY+14);
-        ctx.stroke();
+        const px=x+bw*(.18+i*.17);
+        ctx.beginPath(); ctx.moveTo(px,y+8); ctx.lineTo(px,y+bh-10); ctx.stroke();
       }
-      // small legs, visible near lower edge
-      ctx.fillStyle='#8c542b';
-      const lx1=left?w*.055:w*.895, lx2=left?w*.125:w*.955;
-      roundRect(lx1,botY+6,14,h*.075,5,true); roundRect(lx2,botY,14,h*.070,5,true);
+      // Thin side thickness and two legs visible below, matching the reference bench feel.
+      ctx.fillStyle='rgba(96,55,25,.22)';
+      if(left) ctx.fillRect(x+bw-10,y+8,10,bh-16); else ctx.fillRect(x,y+8,10,bh-16);
+      ctx.fillStyle='#8f562d';
+      roundRect(x+bw*.25,y+bh-4,14,h*.085,5,true);
+      roundRect(x+bw*.68,y+bh-9,14,h*.080,5,true);
     }
-    sideBench(true); sideBench(false);
+    lowBench(true); lowBench(false);
     ctx.restore();
   }
     function drawShell(x,y,s=1,rot=0){
