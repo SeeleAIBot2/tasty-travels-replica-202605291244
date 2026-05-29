@@ -252,53 +252,7 @@
     ctx.fillStyle='rgba(119,202,214,.17)'; for(let i=0;i<5;i++){ ctx.beginPath(); ctx.ellipse(w*(.08+i*.22), h*.455+Math.sin(i)*6, 92, 9, 0,0,Math.PI*2); ctx.fill(); }
     ctx.strokeStyle='rgba(255,255,255,.28)'; ctx.lineWidth=2; ctx.lineCap='round'; for(let i=0;i<4;i++){ ctx.beginPath(); ctx.moveTo(w*(.03+i*.24),h*(.485+i*.012)); ctx.bezierCurveTo(w*(.12+i*.24),h*(.468+i*.012),w*(.20+i*.24),h*(.498+i*.012),w*(.30+i*.24),h*(.482+i*.012)); ctx.stroke(); }
     ctx.fillStyle='rgba(177,122,74,.20)'; for(let i=0;i<18;i++){ ctx.beginPath(); ctx.ellipse((i*97)%w, h*(.60+(i%5)*.07), 13+(i%3)*5, 7+(i%2)*3, .5, 0, Math.PI*2); ctx.fill(); }
-    drawPalm(w*.075,h*.615,.76,-1); drawPalm(w*.925,h*.615,.74,1); drawCanopy();
-  }
-  function drawPalm(x,y,s,flip){
-    ctx.save(); ctx.translate(x,y); ctx.scale(s*flip,s);
-    // x/y is the root contact point on the sand. Draw from the ground upward so
-    // the palm is visibly planted, with shadow and sand overlap at the root.
-    ctx.save();
-    ctx.fillStyle='rgba(82,53,28,.26)'; ctx.beginPath(); ctx.ellipse(0,5,62,15,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='rgba(236,185,105,.42)'; ctx.beginPath(); ctx.ellipse(0,-2,26,7,0,0,Math.PI*2); ctx.fill();
-    ctx.restore();
-
-    const crownY=-235;
-    ctx.save(); ctx.rotate(-.10);
-    const trunk=ctx.createLinearGradient(-14,0,17,crownY);
-    trunk.addColorStop(0,'#6f4326'); trunk.addColorStop(.35,'#906038'); trunk.addColorStop(.72,'#b77d49'); trunk.addColorStop(1,'#d09a61');
-    ctx.fillStyle=trunk;
-    ctx.beginPath();
-    ctx.moveTo(-16,0); ctx.bezierCurveTo(-10,-70,-7,-155,-9,crownY+10);
-    ctx.bezierCurveTo(-4,crownY-2,13,crownY-5,18,crownY+8);
-    ctx.bezierCurveTo(13,-150,17,-70,15,0);
-    ctx.quadraticCurveTo(0,10,-16,0); ctx.fill();
-    ctx.strokeStyle='rgba(76,42,22,.34)'; ctx.lineWidth=2.4;
-    for(let i=0;i<13;i++){ const yy=-12-i*17; ctx.beginPath(); ctx.moveTo(-12+Math.sin(i*.8)*3,yy+5); ctx.quadraticCurveTo(1,yy-4,14,yy+2); ctx.stroke(); }
-    ctx.strokeStyle='rgba(255,216,150,.22)'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(7,-8); ctx.bezierCurveTo(10,-78,9,-165,6,crownY+12); ctx.stroke();
-    ctx.restore();
-
-    ctx.save(); ctx.translate(0,crownY);
-    function frond(rot,len,w,col,alpha=1,bend=0){
-      ctx.save(); ctx.rotate(rot); ctx.globalAlpha=alpha; ctx.fillStyle=col;
-      ctx.beginPath(); ctx.moveTo(0,0);
-      ctx.bezierCurveTo(len*.16,-w*1.45+bend,len*.58,-w*1.05,len,-w*.18);
-      ctx.bezierCurveTo(len*.64,w*.28,len*.24,w*.24,0,0); ctx.fill();
-      ctx.strokeStyle='rgba(26,86,43,.25)'; ctx.lineWidth=1.15; ctx.beginPath(); ctx.moveTo(4,-1); ctx.bezierCurveTo(len*.34,-w*.80+bend*.35,len*.68,-w*.48,len*.95,-w*.12); ctx.stroke();
-      ctx.strokeStyle='rgba(15,73,34,.16)'; ctx.lineWidth=.7;
-      for(let k=2;k<7;k++){ const px=len*k/8; ctx.beginPath(); ctx.moveTo(px,-w*.32); ctx.lineTo(px+8,-w*.76+(k%2)*5); ctx.stroke(); }
-      ctx.restore();
-    }
-    // Three desaturated leaf layers: back darker, front lighter, all long and thin.
-    for(const f of [[-1.45,118,16,.40,-5],[-1.08,138,17,.50,2],[-.70,154,18,.58,-3],[-.34,145,17,.52,4],[.08,126,15,.45,-1]]) frond(f[0],f[1],f[2],'#2f7f49',f[3],f[4]);
-    for(const f of [[-1.02,146,18,.72,3],[-.62,166,19,.82,-4],[-.18,160,18,.80,2],[.32,140,17,.68,-2],[.78,116,15,.56,3]]) frond(f[0],f[1],f[2],'#4d9f5b',f[3],f[4]);
-    for(const f of [[-1.22,100,13,.48,0],[-.48,124,14,.58,-3],[.10,118,14,.54,3],[.58,96,12,.48,-1]]) frond(f[0],f[1],f[2],'#6eb86c',f[3],f[4]);
-    ctx.globalAlpha=1;
-    const crown=ctx.createRadialGradient(-4,-4,3,0,0,20); crown.addColorStop(0,'#75b965'); crown.addColorStop(1,'#2d7844');
-    ctx.fillStyle=crown; ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='rgba(104,65,34,.72)'; for(const [cx,cy,r] of [[-9,10,6],[2,13,6],[11,8,5]]){ ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); }
-    ctx.restore();
-    ctx.restore();
+    drawCanopy();
   }
   function drawCanopy(){
     const w=state.w,h=state.h; ctx.save();
