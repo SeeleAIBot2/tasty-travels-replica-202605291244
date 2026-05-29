@@ -21,7 +21,7 @@
   const state = {
     w: 0, h: 0, portrait: true, coins: 0, displayCoins: 0,
     items: [], particles: [], floating: [], current: null,
-    seq: testOrders ? [0,0,1,1,0,0,1,1,2,2,2,2] : [0,0,1,1,2,2,3,3,4,4,5,5,6,7,8], seqIndex:0,
+    seq: testOrders ? [0,0,1,1,0,0,1,1,2,2,2,2] : [], seqIndex:0, nextLvl:0,
     orders: testOrders ? [{lvl:1, reward:120, done:false}, {lvl:2, reward:180, done:false}] : [{lvl:6, reward:500, done:false}, {lvl:8, reward:600, done:false}],
     orderIndex:0, dragging:false, pointerX:0, handT:0, ended:false
   };
@@ -61,8 +61,18 @@
   function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
   function lerp(a,b,t){ return a+(b-a)*t; }
 
+  function rollSpawnLevel(){
+    if(testOrders) return state.seq[state.seqIndex++ % state.seq.length];
+    const r=Math.random();
+    // Merge-game material generator: only low-tier drinks enter from the system.
+    // High tiers must be earned through player merges, not handed out in sequence.
+    if(r<.70) return 0;      // 70% level 1
+    if(r<.95) return 1;      // 25% level 2
+    return 2;                // 5% level 3
+  }
   function spawnCurrent(){
-    const lvl = state.seq[state.seqIndex++ % state.seq.length];
+    const lvl = state.nextLvl ?? rollSpawnLevel();
+    state.nextLvl = rollSpawnLevel();
     const it = makeItem(lvl, 0, table.launchY, true);
     placeCurrent(it, true);
     state.items.push(it); state.current = it;
@@ -405,7 +415,7 @@
     const coinX=w*.18, coinY=h*.055;
     roundRect(coinX-62,coinY-17,124,34,17,true,'rgba(255,255,255,.94)','#8a572b',2); drawCoin(coinX-42,coinY,12); text(Math.round(state.displayCoins),coinX-20,coinY+4,19,'#7a3b18','left','bold');
     const nx=w*.82, ny=h*.055;
-    roundRect(nx-35,ny-8,70,82,14,true,'rgba(255,248,219,.9)','#8a572b',2); drawDrinkIcon(state.seq[state.seqIndex%state.seq.length],nx,ny+25,.74); text('下一個',nx,ny+61,15,'#7a3b18','center','bold');
+    roundRect(nx-35,ny-8,70,82,14,true,'rgba(255,248,219,.9)','#8a572b',2); drawDrinkIcon(state.nextLvl,nx,ny+25,.74); text('下一個',nx,ny+61,15,'#7a3b18','center','bold');
     const ox=w*.38, oy=h*.17;
     drawOrder(ox,oy,state.orders[0],0); drawOrder(ox+92,oy+3,state.orders[1],1);
   }
@@ -575,7 +585,7 @@
   function roundRect(x,y,w,h,r,fill=true,fs,ss,lw){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); if(fs) ctx.fillStyle=fs; if(fill) ctx.fill(); if(ss){ ctx.strokeStyle=ss; ctx.lineWidth=lw||1; ctx.stroke(); } }
   function text(str,x,y,size,color,align='left',weight='',stroke){ ctx.save(); ctx.font=`${weight} ${size}px Arial`; ctx.textAlign=align; ctx.textBaseline='middle'; if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=5; for(const [k,line] of String(str).split('\n').entries()) ctx.strokeText(line,x,y+k*size*1.05); } ctx.fillStyle=color; for(const [k,line] of String(str).split('\n').entries()) ctx.fillText(line,x,y+k*size*1.05); ctx.restore(); }
 
-  function reset(){ state.items=[]; state.particles=[]; state.floating=[]; state.coins=0; state.displayCoins=0; state.seqIndex=0; state.orderIndex=0; state.ended=false; state.orders.forEach(o=>o.done=false); spawnCurrent(); }
+  function reset(){ state.items=[]; state.particles=[]; state.floating=[]; state.coins=0; state.displayCoins=0; state.seqIndex=0; state.nextLvl=rollSpawnLevel(); state.orderIndex=0; state.ended=false; state.orders.forEach(o=>o.done=false); spawnCurrent(); }
   let last=performance.now(); function loop(now){ const dt=Math.min(.033,(now-last)/1000); last=now; update(dt); draw(); requestAnimationFrame(loop); }
   resize(); reset(); requestAnimationFrame(loop);
 })();
