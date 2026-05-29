@@ -226,7 +226,9 @@
   function completeOrder(item){
     const o=state.orders[state.orderIndex]; if(!o||o.done) return;
     o.done=true; addCoins(o.reward,item.x,item.y); addFloat(item.x,item.y,'订单完成 +' + o.reward);
-    item.dead=true; burst(item.x,item.y,'#ffe66d'); state.orderIndex++;
+    // Completing an order must not remove the drink from the table. Drinks only
+    // disappear when they merge into a higher tier or become unrecoverably invalid.
+    burst(item.x,item.y,'#ffe66d'); state.orderIndex++;
   }
   function addCoins(n,x,y){ state.coins+=n; for(let k=0;k<Math.min(8,n/100);k++) state.particles.push({x,y,vx:(Math.random()-.5)*220,vy:-160-Math.random()*120,life:.8+Math.random()*.4,max:1.1,a:1,type:'coin'}); }
   function addFloat(x,y,text){ state.floating.push({x,y,text,life:1.1,max:1.1,a:1}); }
