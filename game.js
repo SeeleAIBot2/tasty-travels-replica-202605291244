@@ -111,7 +111,14 @@
       if(it.dead) continue;
       it.mergeLock=Math.max(0,it.mergeLock-dt); it.pop=Math.max(0,it.pop-dt*4); it.angle = 0; it.spin = 0;
       if(it.frozen){
-        it.x=it.lockedX; it.y=it.lockedY; it.vx=0; it.vy=0;
+        if(it.mergeLock>0){
+          // Newly merged cups are briefly pinned so they do not inherit merge momentum.
+          it.x=it.lockedX; it.y=it.lockedY; it.vx=0; it.vy=0;
+        } else {
+          // After the lock window they become normal upright physical pieces again,
+          // so later shots can push the whole cup cluster forward.
+          it.frozen=false; it.active=true; it.vx=0; it.vy=0;
+        }
       }
       if(it.active && !it.frozen){
         it.x += it.vx*dt; it.y += it.vy*dt;
@@ -157,13 +164,27 @@
       if(d>0 && d<touch){
         const nx=dx/d, ny=dy/d, push=(touch-d)*.42;
         if(a.frozen || b.frozen){
-          // Frozen merge products are pinned pieces. Do not move either item here;
-          // otherwise the merged cup visually slides after creation.
-          if(!a.frozen){ a.vx=0; a.vy=0; }
-          if(!b.frozen){ b.vx=0; b.vy=0; }
+          // During the short post-merge lock, the merged cup stays pinned, but the
+          // incoming cup keeps a damped shove instead of dying instantly.
+          if(a.frozen && b.frozen) continue;
+          const mover = a.frozen ? b : a;
+          const dir = a.frozen ? 1 : -1;
+          mover.x += nx*push*dir; mover.y += ny*push*dir;
+          const vn = mover.vx*nx + mover.vy*ny;
+          if(vn*dir < 0){
+            mover.vx -= nx*vn*1.15;
+            mover.vy -= ny*vn*1.15;
+          }
+          mover.vx *= .82; mover.vy *= .82;
         } else {
           a.x-=nx*push; a.y-=ny*push; b.x+=nx*push; b.y+=ny*push;
-          const tx=a.vx, ty=a.vy; a.vx=b.vx*.68; a.vy=b.vy*.68; b.vx=tx*.68; b.vy=ty*.68;
+          const rvx=b.vx-a.vx, rvy=b.vy-a.vy, rel=rvx*nx+rvy*ny;
+          if(rel<0){
+            const impulse=-(1.05)*rel*.5;
+            a.vx-=impulse*nx; a.vy-=impulse*ny;
+            b.vx+=impulse*nx; b.vy+=impulse*ny;
+          }
+          a.vx*=.98; a.vy*=.98; b.vx*=.98; b.vy*=.98;
         }
       }
     }
@@ -176,7 +197,7 @@
     // Merge result must be born exactly at the contact midpoint and stay stable.
     // Do not inherit velocity, add bounce, or slide forward after merging.
     n.lockedX=x; n.lockedY=y;
-    n.vx=0; n.vy=0; n.spin=0; n.angle=0; n.active=false; n.frozen=true; n.mergeLock=.35; n.pop=1;
+    n.vx=0; n.vy=0; n.spin=0; n.angle=0; n.active=false; n.frozen=true; n.mergeLock=.22; n.pop=1;
     state.items.push(n);
     if((old===6 && state.orderIndex===0) || (old===8 && state.orderIndex===1)) completeOrder(n);
     if(lvl>=9){ state.ended=true; addFloat(state.w/2,state.h*.45,'完成！点击重玩'); }
