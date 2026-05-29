@@ -303,25 +303,53 @@
   }
   function drawCanopy(){
     const w=state.w,h=state.h; ctx.save();
-    const y=h*.034;
-    const beam=ctx.createLinearGradient(0,y,0,y+h*.046); beam.addColorStop(0,'#c58a45'); beam.addColorStop(.58,'#9d642f'); beam.addColorStop(1,'#74441f');
-    ctx.fillStyle=beam; ctx.fillRect(0,y+h*.018,w,h*.032);
-    ctx.fillStyle='rgba(75,45,20,.18)'; ctx.fillRect(0,y+h*.052,w,h*.014);
-    const straw=ctx.createLinearGradient(0,y,0,y+h*.135);
-    straw.addColorStop(0,'#f8dc83'); straw.addColorStop(.42,'#e2b65a'); straw.addColorStop(.82,'#bd8c40'); straw.addColorStop(1,'#947033');
-    for(let row=0;row<3;row++){
-      const yy=y+h*(.004+row*.031), step=32-row*1.5;
-      ctx.fillStyle=straw; ctx.globalAlpha= row===0?.62:(row===1?.48:.30);
-      for(let x=-34-row*8;x<w+46;x+=step){
-        const drop=h*(.042+((x/step+row*1.7)%5)*.012+row*.010);
-        ctx.beginPath(); ctx.moveTo(x,yy); ctx.quadraticCurveTo(x+10,yy+drop,x+25,yy+2); ctx.quadraticCurveTo(x+15,yy+drop*.38,x,yy); ctx.fill();
+    const y=h*.024;
+    // Solid wooden support reads as a real drink-stand beam, not a flat strip.
+    const backBeam=ctx.createLinearGradient(0,y+h*.010,0,y+h*.064);
+    backBeam.addColorStop(0,'#c48743'); backBeam.addColorStop(.45,'#8e5528'); backBeam.addColorStop(1,'#603516');
+    ctx.fillStyle=backBeam; ctx.fillRect(-8,y+h*.030,w+16,h*.040);
+    ctx.fillStyle='rgba(70,38,15,.28)'; ctx.fillRect(-8,y+h*.066,w+16,h*.014);
+    ctx.strokeStyle='rgba(255,207,121,.28)'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(0,y+h*.037); ctx.lineTo(w,y+h*.037); ctx.stroke();
+    // short lashings / knots break the repeated texture feeling.
+    ctx.strokeStyle='rgba(72,42,18,.26)'; ctx.lineWidth=2;
+    for(let x=-10;x<w+20;x+=58){ ctx.beginPath(); ctx.moveTo(x,y+h*.031); ctx.quadraticCurveTo(x+15,y+h*.060,x+35,y+h*.034); ctx.stroke(); }
+
+    function strawPatch(x0,row,wid,drop,tilt,alpha){
+      const top=y+h*(.012+row*.025);
+      const grad=ctx.createLinearGradient(0,top,0,top+drop);
+      grad.addColorStop(0,'rgba(245,221,128,'+alpha+')');
+      grad.addColorStop(.42,'rgba(198,165,72,'+(alpha*.96)+')');
+      grad.addColorStop(1,'rgba(119,91,40,'+(alpha*.72)+')');
+      ctx.fillStyle=grad;
+      ctx.beginPath();
+      ctx.moveTo(x0,top);
+      ctx.bezierCurveTo(x0+wid*.25+tilt,top+drop*.32,x0+wid*.42-tilt,top+drop*.76,x0+wid*.52,top+drop);
+      ctx.bezierCurveTo(x0+wid*.70,top+drop*.70,x0+wid*.90,top+drop*.32,x0+wid,top+2);
+      ctx.quadraticCurveTo(x0+wid*.48,top+drop*.12,x0,top); ctx.fill();
+      // fine straw fibers inside each clump: natural, curved, irregular.
+      ctx.strokeStyle='rgba(92,70,28,'+(alpha*.34)+')'; ctx.lineWidth=1;
+      const fibers=3+(row%2);
+      for(let k=1;k<=fibers;k++){
+        const xx=x0+wid*(k/(fibers+1));
+        ctx.beginPath(); ctx.moveTo(xx,top+2);
+        ctx.bezierCurveTo(xx+tilt*.15,top+drop*.35,xx-tilt*.10,top+drop*.62,xx+Math.sin(k+x0)*4,top+drop*(.82+.04*(k%2)));
+        ctx.stroke();
       }
     }
+    // Back layer: broad soft thatch mass.
+    ctx.globalAlpha=.72;
+    for(let i=0;i<12;i++) strawPatch(-24+i*38,0,42+(i%3)*8,h*(.072+(i%4)*.010),Math.sin(i)*6,.58);
+    // Middle and front layers: longer, denser, non-repeating clumps.
+    ctx.globalAlpha=.88;
+    for(let i=0;i<15;i++) strawPatch(-32+i*31,1,34+(i%5)*7,h*(.088+((i*7)%5)*.012),Math.cos(i*.8)*8,.70);
+    ctx.globalAlpha=.68;
+    for(let i=0;i<10;i++) strawPatch(-18+i*48,2,44+(i%4)*10,h*(.060+((i*5)%4)*.016),Math.sin(i*1.4)*10,.52);
     ctx.globalAlpha=1;
-    ctx.strokeStyle='rgba(91,61,28,.10)'; ctx.lineWidth=1.1;
-    for(let x=-10;x<w+20;x+=28){ ctx.beginPath(); ctx.moveTo(x,y+h*.018); ctx.lineTo(x+7,y+h*.108); ctx.stroke(); }
-    ctx.fillStyle='rgba(64,38,17,.11)'; ctx.fillRect(0,y+h*.088,w,h*.018);
-    ctx.fillStyle='rgba(255,238,164,.24)'; ctx.fillRect(0,y+h*.026,w,h*.012);
+    // Underside occlusion gives thickness, while the top remains bright and summery.
+    const shade=ctx.createLinearGradient(0,y+h*.084,0,y+h*.142);
+    shade.addColorStop(0,'rgba(91,58,22,.14)'); shade.addColorStop(1,'rgba(55,34,14,0)');
+    ctx.fillStyle=shade; ctx.fillRect(0,y+h*.080,w,h*.070);
+    ctx.fillStyle='rgba(255,238,164,.16)'; ctx.fillRect(0,y+h*.020,w,h*.012);
     ctx.restore();
   }
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
