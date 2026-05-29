@@ -225,7 +225,7 @@
 
   function draw(){
     const w=state.w,h=state.h; ctx.clearRect(0,0,w,h);
-    drawBeach(); drawBenches(); drawTable(); drawHUD(); drawQueue();
+    drawBeach(); drawTable(); drawHUD(); drawQueue();
     const items=[...state.items].sort((a,b)=>a.y-b.y);
     for(const it of items) drawItem(it);
     drawParticles(); drawFloating(); drawHand();
@@ -257,40 +257,7 @@
     ctx.restore();
   }
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
-  function drawBenches(){
-    const w=state.w,h=state.h;
-    // Side benches sit below/behind the tray. Only the outside parts are visible beside the table.
-    ctx.save();
-    function sideBench(left){
-      const y1=h*.405, y2=h*.700;
-      const farW=w*.120, nearW=w*.165;
-      const xFar = left ? -w*.055 : w*1.055-farW;
-      const xNear = left ? -w*.090 : w*1.090-nearW;
-      const g=ctx.createLinearGradient(0,y1,0,y2);
-      g.addColorStop(0,'#f3d7a5'); g.addColorStop(.55,'#d7a66a'); g.addColorStop(1,'#a97543');
-      ctx.globalAlpha=.82;
-      ctx.fillStyle=g; ctx.strokeStyle='rgba(112,72,38,.55)'; ctx.lineWidth=2;
-      ctx.beginPath();
-      ctx.moveTo(xFar,y1); ctx.lineTo(xFar+farW,y1+2); ctx.lineTo(xNear+nearW,y2); ctx.lineTo(xNear,y2-4); ctx.closePath();
-      ctx.fill(); ctx.stroke();
-      ctx.save(); ctx.clip();
-      ctx.strokeStyle='rgba(255,232,182,.34)'; ctx.lineWidth=2;
-      for(let i=0;i<4;i++){ const t=(i+1)/5; ctx.beginPath(); ctx.moveTo(lerp(xFar,xNear,t)+farW*.18,y1+10); ctx.lineTo(lerp(xFar,xNear,t)+nearW*.22,y2-12); ctx.stroke(); }
-      ctx.strokeStyle='rgba(101,64,33,.24)'; ctx.lineWidth=1.4;
-      for(let i=0;i<4;i++){ const yy=lerp(y1+20,y2-24,i/3), tt=(yy-y1)/(y2-y1); ctx.beginPath(); ctx.moveTo(lerp(xFar,xNear,tt)+6,yy); ctx.lineTo(lerp(xFar+farW,xNear+nearW,tt)-6,yy+4); ctx.stroke(); }
-      ctx.restore();
-      // Outer face/legs below the plank, partly occluded by bottom UI and tray edge.
-      ctx.fillStyle='rgba(115,69,34,.68)';
-      const sx=left?xNear:xNear+nearW-10;
-      roundRect(sx,y1+18,10,y2-y1+18,4,true);
-      ctx.fillStyle='rgba(90,54,30,.78)';
-      roundRect(left?xNear+nearW*.20:xNear+nearW*.66,y2-4,10,h*.065,5,true);
-      roundRect(left?xNear+nearW*.66:xNear+nearW*.24,y2-24,10,h*.055,5,true);
-      ctx.globalAlpha=.18; ctx.fillStyle='#4b2e1a'; ctx.beginPath(); ctx.ellipse(xNear+nearW*.50,y2+h*.055,nearW*.42,8,0,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-    }
-    sideBench(true); sideBench(false);
-    ctx.restore();
-  }
+  function drawBenches(){}
     function drawShell(x,y,s=1,rot=0){
     ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
     ctx.fillStyle='rgba(255,238,197,.9)'; ctx.strokeStyle='rgba(142,100,58,.55)'; ctx.lineWidth=1.5;
