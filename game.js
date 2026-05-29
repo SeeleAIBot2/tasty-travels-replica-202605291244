@@ -264,10 +264,10 @@
     ctx.restore();
     for(let layer=0;layer<2;layer++){
       ctx.fillStyle=layer?'#2f8f45':'#51b85a';
-      for(let i=-4;i<=4;i++){
-        ctx.save(); ctx.rotate(i*.25+(layer?.12:0));
-        ctx.beginPath(); ctx.moveTo(0,0); ctx.quadraticCurveTo(36,-28-layer*6,78,-8+i*2); ctx.quadraticCurveTo(38,4,0,0); ctx.fill();
-        ctx.strokeStyle='rgba(24,96,48,.24)'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(5,-1); ctx.quadraticCurveTo(36,-20-layer*4,72,-7+i*2); ctx.stroke();
+      for(let i=-5;i<=5;i++){
+        ctx.save(); ctx.rotate(i*.20+(layer?.11:0));
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.quadraticCurveTo(32,-23-layer*5,72,-7+i*2); ctx.quadraticCurveTo(38,1,0,0); ctx.fill();
+        ctx.strokeStyle='rgba(24,96,48,.22)'; ctx.lineWidth=1.1; ctx.beginPath(); ctx.moveTo(5,-1); ctx.quadraticCurveTo(35,-17-layer*4,68,-6+i*2); ctx.stroke();
         ctx.restore();
       }
     }
@@ -281,19 +281,19 @@
     ctx.fillStyle=beam; ctx.fillRect(0,y+h*.018,w,h*.032);
     ctx.fillStyle='rgba(75,45,20,.18)'; ctx.fillRect(0,y+h*.052,w,h*.014);
     const straw=ctx.createLinearGradient(0,y,0,y+h*.135);
-    straw.addColorStop(0,'#f1ce72'); straw.addColorStop(.40,'#d5a048'); straw.addColorStop(.82,'#a97834'); straw.addColorStop(1,'#7a5728');
+    straw.addColorStop(0,'#f8dc83'); straw.addColorStop(.42,'#e2b65a'); straw.addColorStop(.82,'#bd8c40'); straw.addColorStop(1,'#947033');
     for(let row=0;row<3;row++){
-      const yy=y+h*(.006+row*.030), step=27-row*1.5;
-      ctx.fillStyle=straw; ctx.globalAlpha= row===0?.72:(row===1?.58:.40);
+      const yy=y+h*(.004+row*.031), step=32-row*1.5;
+      ctx.fillStyle=straw; ctx.globalAlpha= row===0?.62:(row===1?.48:.30);
       for(let x=-34-row*8;x<w+46;x+=step){
-        const drop=h*(.054+((x/step+row)%4)*.008+row*.014);
+        const drop=h*(.042+((x/step+row*1.7)%5)*.012+row*.010);
         ctx.beginPath(); ctx.moveTo(x,yy); ctx.quadraticCurveTo(x+10,yy+drop,x+25,yy+2); ctx.quadraticCurveTo(x+15,yy+drop*.38,x,yy); ctx.fill();
       }
     }
     ctx.globalAlpha=1;
-    ctx.strokeStyle='rgba(91,61,28,.16)'; ctx.lineWidth=1.4;
-    for(let x=-10;x<w+20;x+=22){ ctx.beginPath(); ctx.moveTo(x,y+h*.018); ctx.lineTo(x+7,y+h*.108); ctx.stroke(); }
-    ctx.fillStyle='rgba(64,38,17,.18)'; ctx.fillRect(0,y+h*.088,w,h*.024);
+    ctx.strokeStyle='rgba(91,61,28,.10)'; ctx.lineWidth=1.1;
+    for(let x=-10;x<w+20;x+=28){ ctx.beginPath(); ctx.moveTo(x,y+h*.018); ctx.lineTo(x+7,y+h*.108); ctx.stroke(); }
+    ctx.fillStyle='rgba(64,38,17,.11)'; ctx.fillRect(0,y+h*.088,w,h*.018);
     ctx.fillStyle='rgba(255,238,164,.24)'; ctx.fillRect(0,y+h*.026,w,h*.012);
     ctx.restore();
   }
@@ -319,8 +319,8 @@
     const h=state.h;
     // Soft contact shadow anchors the tray into the beach instead of floating like a UI panel.
     ctx.save();
-    ctx.fillStyle='rgba(83,50,23,.24)';
-    ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.bottom+42,(botR-botL)*.66,64,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(83,50,23,.22)';
+    ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.bottom+48,(botR-botL)*.70,72,0,0,Math.PI*2); ctx.fill();
     ctx.fillStyle='rgba(112,75,38,.075)'; ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.top+312,(botR-botL)*.64,270,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
     // Chunky legs tucked under the near rail, partially hidden by the table edge.
@@ -331,23 +331,24 @@
     ctx.fillStyle='rgba(255,226,159,.28)';
     roundRect(botL+79,table.bottom+28,7,h*.075,4,true);
     roundRect(botR-91,table.bottom+28,7,h*.075,4,true);
+    ctx.fillStyle='rgba(73,42,20,.22)'; ctx.beginPath(); ctx.ellipse(botL+85,table.bottom+h*.122,34,8,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(botR-86,table.bottom+h*.122,34,8,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
 
     // Outer heavy wood slab with bevel/cut corners.
     ctx.beginPath();
     ctx.moveTo(topL-46,table.top-30); ctx.lineTo(topR+46,table.top-30);
-    ctx.lineTo(botR+44,table.bottom+40); ctx.lineTo(botR+24,table.bottom+62);
-    ctx.lineTo(botL-24,table.bottom+62); ctx.lineTo(botL-44,table.bottom+40);
+    ctx.lineTo(botR+48,table.bottom+42); ctx.lineTo(botR+22,table.bottom+70);
+    ctx.lineTo(botL-22,table.bottom+70); ctx.lineTo(botL-48,table.bottom+42);
     ctx.closePath();
     const outer=ctx.createLinearGradient(0,table.top-42,0,table.bottom+76);
     outer.addColorStop(0,'#ffecbf'); outer.addColorStop(.34,'#f1cc88'); outer.addColorStop(.72,'#d09a59'); outer.addColorStop(1,'#925a2d');
     ctx.save(); ctx.shadowColor='rgba(96,61,29,.22)'; ctx.shadowBlur=18; ctx.shadowOffsetY=8; ctx.fillStyle=outer; ctx.fill(); ctx.restore(); ctx.strokeStyle='rgba(111,72,36,.22)'; ctx.lineWidth=2.8; ctx.stroke();
     ctx.save(); ctx.clip();
     // Natural wood grain: subtle curved strokes and fine highlights, not flat SVG color.
-    for(let i=0;i<68;i++){
+    for(let i=0;i<76;i++){
       const y=lerp(table.top-22,table.bottom+52,(i*29%100)/100);
       const b=xBoundsAt(clamp(y,table.top,table.bottom));
-      ctx.globalAlpha=.16+(i%5)*.026; ctx.strokeStyle=i%3?'#875b2f':'#fff0bd'; ctx.lineWidth=.9+(i%4)*.65;
+      ctx.globalAlpha=.13+(i%6)*.030; ctx.strokeStyle=i%3?'#875b2f':'#fff0bd'; ctx.lineWidth=.9+(i%4)*.65;
       ctx.beginPath(); ctx.moveTo(b.l-58,y+Math.sin(i*.7)*3); ctx.bezierCurveTo((b.l+b.r)/2-58,y+Math.sin(i*1.3)*14,(b.l+b.r)/2+42,y-Math.cos(i*.9)*12,b.r+58,y+Math.sin(i*.7)*8); ctx.stroke(); if(i%5===0){ ctx.beginPath(); ctx.moveTo(b.l+20+(i*37%(b.r-b.l)),y-2); ctx.quadraticCurveTo(b.l+42+(i*37%(b.r-b.l)),y+5,b.l+72+(i*37%(b.r-b.l)),y-1); ctx.stroke(); }
     }
     for(let k=0;k<14;k++){ const y=lerp(table.top,table.bottom+40,(k*23%100)/100), b=xBoundsAt(clamp(y,table.top,table.bottom)); const x=lerp(b.l-40,b.r+40,(k*41%100)/100); ctx.globalAlpha=.16; ctx.strokeStyle='#7a461f'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(x,y,10+(k%3)*4,4+(k%2)*2,.4,0,Math.PI*2); ctx.stroke(); }
@@ -355,7 +356,7 @@
     ctx.globalAlpha=1;
     // Darker side faces make the wooden frame read as a 3D object.
     ctx.save();
-    ctx.fillStyle='rgba(123,78,38,.26)';
+    ctx.fillStyle='rgba(111,69,33,.30)';
     ctx.beginPath(); ctx.moveTo(topL-44,table.top-24); ctx.lineTo(topL-18,table.top-2); ctx.lineTo(botL-22,table.bottom+32); ctx.lineTo(botL-54,table.bottom+32); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.moveTo(topR+44,table.top-24); ctx.lineTo(topR+18,table.top-2); ctx.lineTo(botR+22,table.bottom+32); ctx.lineTo(botR+54,table.bottom+32); ctx.closePath(); ctx.fill();
     ctx.restore();
@@ -368,7 +369,7 @@
 
     // Side cast shadows help benches read as below the tabletop, not pasted on top.
     ctx.save();
-    ctx.fillStyle='rgba(73,44,21,.22)';
+    ctx.fillStyle='rgba(65,39,19,.30)';
     ctx.beginPath(); ctx.moveTo(topL-42,table.top-8); ctx.lineTo(topL-8,table.top+4); ctx.lineTo(botL-18,table.bottom+24); ctx.lineTo(botL-48,table.bottom+30); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.moveTo(topR+42,table.top-8); ctx.lineTo(topR+8,table.top+4); ctx.lineTo(botR+18,table.bottom+24); ctx.lineTo(botR+48,table.bottom+30); ctx.closePath(); ctx.fill();
     ctx.restore();
@@ -376,11 +377,11 @@
     // Inner lighter bevel, separated from the glass inset.
     ctx.beginPath();
     ctx.moveTo(topL-28,table.top-10); ctx.lineTo(topR+28,table.top-10);
-    ctx.lineTo(botR+42,table.bottom+22); ctx.lineTo(botL-42,table.bottom+22); ctx.closePath();
+    ctx.lineTo(botR+46,table.bottom+25); ctx.lineTo(botL-46,table.bottom+25); ctx.closePath();
     const bevel=ctx.createLinearGradient(0,table.top,0,table.bottom+18);
     bevel.addColorStop(0,'#fff0c6'); bevel.addColorStop(.52,'#ecc68d'); bevel.addColorStop(1,'#c99661');
     ctx.fillStyle=bevel; ctx.fill(); ctx.strokeStyle='rgba(122,78,37,.18)'; ctx.lineWidth=2; ctx.stroke();
-    ctx.save(); ctx.globalAlpha=.18; ctx.strokeStyle='rgba(255,229,174,.72)'; ctx.lineWidth=9;
+    ctx.save(); ctx.globalAlpha=.14; ctx.strokeStyle='rgba(255,235,190,.70)'; ctx.lineWidth=11;
     for(let k=0;k<4;k++){ ctx.beginPath(); ctx.moveTo(lerp(topL,topR,k/3)-28,table.top-14); ctx.lineTo(lerp(botL,botR,k/3)-48+k*22,table.bottom+42); ctx.stroke(); }
     ctx.restore();
 
@@ -391,10 +392,10 @@
     ctx.beginPath(); ctx.moveTo(iTopL+14,iTop); ctx.lineTo(iTopR-14,iTop); ctx.quadraticCurveTo(iTopR,iTop,iTopR+2,iTop+14); ctx.lineTo(iBotR-2,iBot-16); ctx.quadraticCurveTo(iBotR,iBot,iBotR-16,iBot); ctx.lineTo(iBotL+16,iBot); ctx.quadraticCurveTo(iBotL,iBot,iBotL+2,iBot-16); ctx.lineTo(iTopL-2,iTop+14); ctx.quadraticCurveTo(iTopL,iTop,iTopL+14,iTop); ctx.closePath();
     ctx.fillStyle=sand; ctx.fill();
     ctx.save(); ctx.clip();
-    const aoTop=ctx.createLinearGradient(0,iTop,0,iTop+66); aoTop.addColorStop(0,'rgba(65,42,20,.42)'); aoTop.addColorStop(1,'rgba(87,61,32,0)'); ctx.fillStyle=aoTop; ctx.fillRect(0,iTop,state.w,50);
-    const aoBot=ctx.createLinearGradient(0,iBot-72,0,iBot); aoBot.addColorStop(0,'rgba(87,61,32,0)'); aoBot.addColorStop(1,'rgba(65,42,20,.34)'); ctx.fillStyle=aoBot; ctx.fillRect(0,iBot-60,state.w,70);
+    const aoTop=ctx.createLinearGradient(0,iTop,0,iTop+72); aoTop.addColorStop(0,'rgba(58,37,18,.48)'); aoTop.addColorStop(1,'rgba(87,61,32,0)'); ctx.fillStyle=aoTop; ctx.fillRect(0,iTop,state.w,66);
+    const aoBot=ctx.createLinearGradient(0,iBot-72,0,iBot); aoBot.addColorStop(0,'rgba(87,61,32,0)'); aoBot.addColorStop(1,'rgba(65,42,20,.34)'); ctx.fillStyle=aoBot; ctx.fillRect(0,iBot-78,state.w,88);
     ctx.restore();
-    ctx.save(); ctx.shadowColor='rgba(91,62,32,.66)'; ctx.shadowBlur=22; ctx.shadowOffsetY=6; ctx.strokeStyle='rgba(80,50,24,.36)'; ctx.lineWidth=18; ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.shadowColor='rgba(91,62,32,.66)'; ctx.shadowBlur=22; ctx.shadowOffsetY=6; ctx.strokeStyle='rgba(70,44,22,.42)'; ctx.lineWidth=21; ctx.stroke(); ctx.restore();
     ctx.strokeStyle='rgba(91,134,128,.10)'; ctx.lineWidth=2.5; ctx.stroke();
     ctx.save(); ctx.clip();
     // Cloudy sand and small grain noise.
@@ -402,7 +403,7 @@
     ctx.globalAlpha=.26; ctx.fillStyle='#fff0b8'; for(let i=0;i<16;i++){ const y=lerp(iTop+24,iBot-26,i/8), t=(y-iTop)/(iBot-iTop), l=lerp(iTopL,iBotL,t), r=lerp(iTopR,iBotR,t); ctx.beginPath(); ctx.ellipse((l+r)/2+Math.sin(i*1.7)*18,y,(r-l)*(.26+.04*Math.sin(i)),16,.08,0,Math.PI*2); ctx.fill(); }
     ctx.globalAlpha=1;
     // Beach details stay decorative, not blocking the main sliding lane.
-    ctx.globalAlpha=.72;
+    ctx.globalAlpha=.76;
     drawShell(lerp(iTopL,iTopR,.18),lerp(iTop,iBot,.30),.50,-.45);
     drawShell(lerp(iTopL,iTopR,.78),lerp(iTop,iBot,.46),.46,.55);
     drawShell(lerp(iBotL,iBotR,.16),lerp(iTop,iBot,.78),.50,.7);
@@ -418,7 +419,7 @@
     drawPebble(lerp(iBotL,iBotR,.50),lerp(iTop,iBot,.86),.28,'rgba(132,103,72,.17)');
     ctx.globalAlpha=1;
     // Broad diagonal glass highlights, not grid lines.
-    ctx.globalAlpha=.12; ctx.strokeStyle='rgba(255,255,255,.70)'; ctx.lineWidth=24; ctx.lineCap='round';
+    ctx.globalAlpha=.13; ctx.strokeStyle='rgba(255,255,255,.66)'; ctx.lineWidth=26; ctx.lineCap='round';
     [[.12,.04,.38,.68],[.44,.00,.64,.55],[.62,.24,.86,.92],[.22,.64,.42,.96]].forEach(([a,b,c,d],idx)=>{ ctx.beginPath(); ctx.moveTo(lerp(iTopL,iTopR,a),lerp(iTop,iBot,b)); ctx.bezierCurveTo(lerp(iTopL,iTopR,(a+c)/2),lerp(iTop,iBot,b+.16),lerp(iBotL,iBotR,(a+c)/2+.06),lerp(iTop,iBot,d-.14),lerp(iBotL,iBotR,c),lerp(iTop,iBot,d)); ctx.stroke(); });
     // Original-style aiming guides: one center line and one dashed horizontal threshold.
     ctx.globalAlpha=.82; ctx.strokeStyle='rgba(255,255,255,.92)'; ctx.lineWidth=4; ctx.setLineDash([]);
@@ -428,18 +429,19 @@
     ctx.restore();
     // Glass thickness rim / clear collision boundary.
     ctx.beginPath(); ctx.moveTo(iTopL+3,iTop+3); ctx.lineTo(iTopR-3,iTop+3); ctx.lineTo(iBotR-5,iBot-5); ctx.lineTo(iBotL+5,iBot-5); ctx.closePath();
-    ctx.strokeStyle='rgba(69,117,109,.065)'; ctx.lineWidth=5; ctx.stroke();
+    ctx.strokeStyle='rgba(72,118,112,.10)'; ctx.lineWidth=8; ctx.stroke();
+    ctx.strokeStyle='rgba(224,255,246,.13)'; ctx.lineWidth=3; ctx.stroke();
     ctx.beginPath(); ctx.moveTo(iTopL,iTop); ctx.lineTo(iTopR,iTop); ctx.lineTo(iBotR,iBot); ctx.lineTo(iBotL,iBot); ctx.closePath();
-    ctx.strokeStyle='rgba(230,255,247,.14)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.strokeStyle='rgba(230,255,247,.11)'; ctx.lineWidth=.9; ctx.stroke();
 
     // Thick near front rail overlaps the tray lip, giving the table real weight.
     ctx.save();
     const rail=ctx.createLinearGradient(0,table.bottom-10,0,table.bottom+54);
-    rail.addColorStop(0,'rgba(255,220,164,.92)'); rail.addColorStop(.55,'rgba(209,149,86,.88)'); rail.addColorStop(1,'rgba(139,88,43,.84)');
+    rail.addColorStop(0,'rgba(255,224,171,.94)'); rail.addColorStop(.50,'rgba(216,154,88,.90)'); rail.addColorStop(1,'rgba(135,84,40,.88)');
     ctx.fillStyle=rail; ctx.strokeStyle='rgba(104,67,34,.34)'; ctx.lineWidth=2.4;
     ctx.beginPath();
-    ctx.moveTo(botL-12,table.bottom-6); ctx.lineTo(botR+12,table.bottom-6);
-    ctx.lineTo(botR+38,table.bottom+44); ctx.lineTo(botL-38,table.bottom+44); ctx.closePath();
+    ctx.moveTo(botL-16,table.bottom-8); ctx.lineTo(botR+16,table.bottom-8);
+    ctx.lineTo(botR+42,table.bottom+52); ctx.lineTo(botL-42,table.bottom+52); ctx.closePath();
     ctx.fill(); ctx.stroke();
     ctx.globalAlpha=.24; ctx.strokeStyle='#ffe7b0'; ctx.lineWidth=3;
     ctx.beginPath(); ctx.moveTo(botL-4,table.bottom+4); ctx.lineTo(botR+4,table.bottom+4); ctx.stroke();
@@ -487,7 +489,7 @@
   function drawItem(it){
     if(it.aim){ ctx.save(); ctx.translate(it.x,it.y); ctx.rotate(it.norm*.30); ctx.strokeStyle='rgba(255,255,255,.98)'; ctx.lineWidth=5; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,-it.radius*.95); ctx.lineTo(0,-Math.max(150,state.h*.25)); ctx.stroke(); ctx.restore(); }
     ctx.save(); ctx.globalAlpha=.38; ctx.fillStyle='rgba(49,35,20,.68)'; ctx.beginPath(); ctx.ellipse(it.x+3,it.y+it.radius*.60,it.radius*.62,it.radius*.20,0,0,Math.PI*2); ctx.fill(); ctx.restore();
-    drawDrinkIcon(it.lvl,it.x,it.y,(it.radius/25.4)*(1+it.pop*.10),0);
+    drawDrinkIcon(it.lvl,it.x,it.y,(it.radius/24.7)*(1+it.pop*.10),0);
   }
   function drawDrinkIcon(lvl,x,y,s=1,rot=0){
     const d=drinks[lvl] || drinks[drinks.length-1];
@@ -522,7 +524,7 @@
 
     // Thick transparent glass body.
     const body=ctx.createLinearGradient(0,-h*.52,0,h*.35);
-    body.addColorStop(0,'rgba(255,255,255,.26)'); body.addColorStop(.20,sp.glass); body.addColorStop(.68,'rgba(220,238,235,.28)'); body.addColorStop(1,'rgba(128,164,166,.26)');
+    body.addColorStop(0,'rgba(255,255,255,.20)'); body.addColorStop(.20,sp.glass); body.addColorStop(.68,'rgba(220,238,235,.28)'); body.addColorStop(1,'rgba(128,164,166,.26)');
     ctx.beginPath();
     ctx.moveTo(-top/2,-h*.48);
     ctx.bezierCurveTo(-mid/2,-h*.22,-bot/2,h*.08,-bot/2,h*.30);
@@ -568,7 +570,7 @@
     for(let i=0;i<3;i++){ ctx.beginPath(); ctx.ellipse(Math.sin(i*2.1)*top*.12,-h*.05+i*h*.12,top*.25,h*.035,.12,0,Math.PI*2); ctx.fill(); }
     ctx.globalAlpha=.55; ctx.strokeStyle='rgba(255,255,255,.90)'; ctx.lineWidth=3; ctx.beginPath(); ctx.ellipse(0,-h*.16,top*.34,5,0,0,Math.PI*2); ctx.stroke();
     ctx.globalAlpha=.24; ctx.fillStyle='rgba(255,255,255,.95)'; ctx.beginPath(); ctx.ellipse(-top*.05,h*.08,top*.22,5,.1,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha=.55; ctx.fillStyle='rgba(58,27,18,.58)'; ctx.fillRect(-top/2,h*.16,top,h*.20);
+    ctx.globalAlpha=.62; ctx.fillStyle='rgba(48,22,14,.64)'; ctx.fillRect(-top/2,h*.14,top,h*.23);
     ctx.globalAlpha=.30; ctx.fillStyle='rgba(255,255,255,.9)'; for(let b=0;b<3+(tier>3?2:0);b++){ ctx.beginPath(); ctx.arc(-top*.20+b*top*.12,-h*.02+(b%2)*h*.09,1.8+(b%2),0,Math.PI*2); ctx.fill(); }
     ctx.globalAlpha=1;
     ctx.restore();
@@ -611,12 +613,12 @@
     if(sp.fruit==='royal' && s>.30){ citrus(-top*.40,-h*.48,12,'#ffd84d'); leaf(top*.20,-h*.57,-.55); leaf(top*.34,-h*.54,.35); ctx.fillStyle='#ff5b74'; ctx.beginPath(); ctx.arc(top*.05,-h*.56,7,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#ffe36d'; ctx.beginPath(); ctx.moveTo(top*.20,-h*.84); ctx.lineTo(top*.50,-h*.62); ctx.lineTo(-top*.02,-h*.62); ctx.closePath(); ctx.fill(); ctx.strokeStyle='#b66b22'; ctx.lineWidth=2; ctx.stroke(); }
 
     // Cup rim and base ellipses add thickness.
-    ctx.globalAlpha=.36; ctx.strokeStyle='rgba(255,244,220,.55)'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.ellipse(0,-h*.56,top*.45,7,0,0,Math.PI*2); ctx.stroke();
-    ctx.globalAlpha=.28; ctx.strokeStyle='rgba(83,82,72,.36)'; ctx.beginPath(); ctx.ellipse(0,h*.38,top*.34,6,0,0,Math.PI*2); ctx.stroke();
+    ctx.globalAlpha=.28; ctx.strokeStyle='rgba(255,244,220,.42)'; ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.ellipse(0,-h*.56,top*.43,7,0,0,Math.PI*2); ctx.stroke();
+    ctx.globalAlpha=.42; ctx.strokeStyle='rgba(70,63,51,.48)'; ctx.lineWidth=2.2; ctx.beginPath(); ctx.ellipse(0,h*.39,top*.38,7,0,0,Math.PI*2); ctx.stroke();
 
     // Glass highlights and refraction lines.
-    ctx.globalAlpha=.24; ctx.strokeStyle='rgba(255,255,255,.54)'; ctx.lineWidth=1.8; ctx.lineCap='round';
+    ctx.globalAlpha=.18; ctx.strokeStyle='rgba(255,255,255,.48)'; ctx.lineWidth=1.8; ctx.lineCap='round';
     ctx.beginPath(); ctx.moveTo(-top*.25,-h*.38); ctx.bezierCurveTo(-top*.38,-h*.10,-top*.26,h*.13,-top*.12,h*.28); ctx.stroke();
     ctx.globalAlpha=.18; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.ellipse(-top*.22,-h*.12,top*.08,h*.28,-.10,0,Math.PI*2); ctx.fill();
     ctx.globalAlpha=.22; ctx.strokeStyle='rgba(255,255,255,.58)'; ctx.lineWidth=1.1;
