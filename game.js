@@ -420,12 +420,12 @@
   }
   function drawHUD(){
     const w=state.w, h=state.h;
-    const coinX=w*.18, coinY=h*.055;
+    const coinX=w*.22, coinY=h*.055;
     roundRect(coinX-62,coinY-17,124,34,17,true,'rgba(255,255,255,.94)','#8a572b',2); drawCoin(coinX-42,coinY,12); text(Math.round(state.displayCoins),coinX-20,coinY+4,19,'#7a3b18','left','bold');
-    const nx=w*.840, ny=h*.064;
-    roundRect(nx-29,ny-5,58,68,12,true,'rgba(255,248,219,.92)','#8a572b',1.8); drawDrinkIcon(state.nextLvl,nx,ny+21,.54); text('下一個',nx,ny+51,11,'#7a3b18','center','bold');
-    const ox=w*.175, oy=h*.096;
-    drawOrder(ox,oy,state.orders[0],0,.55); drawOrder(ox+54,oy+2,state.orders[1],1,.55);
+    const nx=w*.835, ny=h*.052;
+    roundRect(nx-31,ny-5,62,74,12,true,'rgba(255,248,219,.94)','#8a572b',1.8); drawDrinkIcon(state.nextLvl,nx,ny+23,.52); text('下一個',nx,ny+57,11,'#7a3b18','center','bold');
+    const ox=w*.165, oy=h*.078;
+    drawOrder(ox,oy,state.orders[0],0,.48); drawOrder(ox+50,oy+2,state.orders[1],1,.48);
   }
   function drawOrder(x,y,o,i,s=1){
     const active=i>=state.orderIndex && !o.done, a=o.done?.5:(active?1:.72); ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.scale(s,s);
@@ -447,16 +447,15 @@
     ctx.restore();
   }
   function drawQueue(){
-    const w=state.w,h=state.h,rowY=h*.865, btnY=h*.986;
-    roundRect(w*.075,rowY-16,w*.19,32,16,true,'rgba(255,255,255,.92)','#7b4a27',2.2);
-    for(let i=0;i<2;i++){
-      const x=w*.125+i*w*.075;
-      drawDrinkIcon(Math.min(i,8),x,rowY,.230+i*.014);
-      if(i<1){ ctx.strokeStyle='rgba(108,70,38,.30)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x+12,rowY); ctx.lineTo(x+w*.075-12,rowY); ctx.stroke(); }
+    const w=state.w,h=state.h,rowY=h*.835, btnY=h*.976;
+    roundRect(w*.070,rowY-14,w*.145,28,14,true,'rgba(255,255,255,.92)','#7b4a27',2);
+    for(let i=0;i<1;i++){
+      const x=w*.135+i*w*.075;
+      drawDrinkIcon(Math.min(i,8),x,rowY,.225+i*.014);
     }
-    const bx=w*.715, bw=w*.205;
+    const bx=w*.750, bw=w*.170;
     roundRect(bx,btnY-11,bw,22,10,true,'#42c955','#1b7d2b',2); text('下載',bx+bw/2,btnY+1,12,'#fff','center','bold','#126320');
-    text('Tasty Travels',w*.16,h*.985,12,'#fff','center','bold','#185c5f');
+    text('Tasty Travels',w*.15,h*.952,11,'#fff','center','bold','#185c5f');
   }
   function drawItem(it){
     if(it.aim){ ctx.save(); ctx.translate(it.x,it.y); ctx.rotate(it.norm*.24); ctx.globalAlpha=.22; ctx.strokeStyle='rgba(255,255,255,.75)'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,-it.radius*.80); ctx.lineTo(0,-Math.max(56,state.h*.085)); ctx.stroke(); ctx.restore(); }
