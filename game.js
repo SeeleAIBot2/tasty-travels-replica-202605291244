@@ -40,12 +40,12 @@
 
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
-    // Wider, shorter tabletop: more like a beach drink table than a long slide lane.
-    table.top = h*0.430;
-    table.bottom = h*0.555;
-    table.launchY = h*0.515;
-    table.leftBottom = w*.070; table.rightBottom = w*.930;
-    table.leftTop = w*.105; table.rightTop = w*.895;
+    // Gameplay-first camera: the tabletop fills the screen instead of receding into the beach.
+    table.top = h*0.250;
+    table.bottom = h*0.865;
+    table.launchY = h*0.785;
+    table.leftBottom = w*.025; table.rightBottom = w*.975;
+    table.leftTop = w*.080; table.rightTop = w*.920;
   }
 
   function xBoundsAt(y){
@@ -55,7 +55,7 @@
       r: lerp(table.rightTop, table.rightBottom, t)
     };
   }
-  function scaleAt(y){ return lerp(0.34, 0.68, clamp((y-table.top)/(table.bottom-table.top),0,1)); }
+  function scaleAt(y){ return lerp(0.50, 1.04, clamp((y-table.top)/(table.bottom-table.top),0,1)); }
   function toLaneX(norm,y){ const b=xBoundsAt(y); return lerp(b.l,b.r,(norm+1)/2); }
   function normFromX(x,y){ const b=xBoundsAt(y); return clamp(((x-b.l)/(b.r-b.l))*2-1,-1,1); }
   function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
@@ -286,28 +286,23 @@
     ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.bottom+34,(botR-botL)*.58,42,0,0,Math.PI*2); ctx.fill();
     ctx.fillStyle='rgba(112,75,38,.075)'; ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.top+160,(botR-botL)*.55,130,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
-    // Chunky legs tucked under the near rail, partially hidden by the table edge.
+    // Only a hint of legs is visible; camera is pushed in toward the playable tabletop.
     ctx.save();
     ctx.fillStyle='#b5753b';
-    roundRect(topL+18,table.top+8,18,h*.075,7,true);
-    roundRect(topR-36,table.top+8,18,h*.075,7,true);
-    roundRect(botL+36,table.bottom+8,24,h*.120,8,true);
-    roundRect(botR-60,table.bottom+8,24,h*.120,8,true);
-    ctx.fillStyle='rgba(255,226,159,.28)';
-    roundRect(topL+23,table.top+15,5,h*.048,3,true);
-    roundRect(topR-31,table.top+15,5,h*.048,3,true);
-    roundRect(botL+43,table.bottom+17,6,h*.085,4,true);
-    roundRect(botR-53,table.bottom+17,6,h*.085,4,true);
-    ctx.fillStyle='rgba(73,42,20,.22)'; ctx.beginPath(); ctx.ellipse(botL+48,table.bottom+h*.095,28,7,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(botR-48,table.bottom+h*.095,28,7,0,0,Math.PI*2); ctx.fill();
+    roundRect(botL+44,table.bottom+9,22,h*.045,8,true);
+    roundRect(botR-66,table.bottom+9,22,h*.045,8,true);
+    ctx.fillStyle='rgba(255,226,159,.25)';
+    roundRect(botL+50,table.bottom+16,5,h*.030,3,true);
+    roundRect(botR-60,table.bottom+16,5,h*.030,3,true);
     ctx.restore();
 
     // Outer wooden tabletop frame: broad rectangle, thinner rim, slight perspective.
     ctx.beginPath();
-    ctx.moveTo(topL-4,table.top-3); ctx.lineTo(topR+4,table.top-3);
-    ctx.lineTo(botR+5,table.bottom+3); ctx.lineTo(botR+3,table.bottom+6);
-    ctx.lineTo(botL-3,table.bottom+6); ctx.lineTo(botL-5,table.bottom+3);
+    ctx.moveTo(topL-22,table.top-14); ctx.lineTo(topR+22,table.top-14);
+    ctx.lineTo(botR+24,table.bottom+22); ctx.lineTo(botR+12,table.bottom+38);
+    ctx.lineTo(botL-12,table.bottom+38); ctx.lineTo(botL-24,table.bottom+22);
     ctx.closePath();
-    const outer=ctx.createLinearGradient(0,table.top-10,0,table.bottom+22);
+    const outer=ctx.createLinearGradient(0,table.top-18,0,table.bottom+42);
     outer.addColorStop(0,'#ffecbf'); outer.addColorStop(.34,'#f1cc88'); outer.addColorStop(.72,'#d09a59'); outer.addColorStop(1,'#925a2d');
     ctx.save(); ctx.shadowColor='rgba(96,61,29,.22)'; ctx.shadowBlur=18; ctx.shadowOffsetY=8; ctx.fillStyle=outer; ctx.fill(); ctx.restore(); ctx.strokeStyle='rgba(111,72,36,.22)'; ctx.lineWidth=2.8; ctx.stroke();
     ctx.save(); ctx.clip();
@@ -324,8 +319,8 @@
     // Darker side faces make the wooden frame read as a 3D object.
     ctx.save();
     ctx.fillStyle='rgba(111,69,33,.30)';
-    ctx.beginPath(); ctx.moveTo(topL-18,table.top-8); ctx.lineTo(topL-6,table.top+2); ctx.lineTo(botL-10,table.bottom+13); ctx.lineTo(botL-24,table.bottom+18); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(topR+18,table.top-8); ctx.lineTo(topR+6,table.top+2); ctx.lineTo(botR+10,table.bottom+13); ctx.lineTo(botR+24,table.bottom+18); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(topL-20,table.top-10); ctx.lineTo(topL-8,table.top+2); ctx.lineTo(botL-12,table.bottom+18); ctx.lineTo(botL-28,table.bottom+24); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(topR+20,table.top-10); ctx.lineTo(topR+8,table.top+2); ctx.lineTo(botR+12,table.bottom+18); ctx.lineTo(botR+28,table.bottom+24); ctx.closePath(); ctx.fill();
     ctx.restore();
     // Visible lower leg sections below the chunky near rail.
     ctx.save();
@@ -343,8 +338,8 @@
 
     // Inner lighter bevel, separated from the glass inset.
     ctx.beginPath();
-    ctx.moveTo(topL-9,table.top-4); ctx.lineTo(topR+9,table.top-4);
-    ctx.lineTo(botR+12,table.bottom+7); ctx.lineTo(botL-12,table.bottom+7); ctx.closePath();
+    ctx.moveTo(topL-14,table.top-6); ctx.lineTo(topR+14,table.top-6);
+    ctx.lineTo(botR+20,table.bottom+12); ctx.lineTo(botL-20,table.bottom+12); ctx.closePath();
     const bevel=ctx.createLinearGradient(0,table.top,0,table.bottom+18);
     bevel.addColorStop(0,'#fff0c6'); bevel.addColorStop(.52,'#ecc68d'); bevel.addColorStop(1,'#c99661');
     ctx.fillStyle=bevel; ctx.fill(); ctx.strokeStyle='rgba(122,78,37,.18)'; ctx.lineWidth=2; ctx.stroke();
@@ -353,7 +348,7 @@
     ctx.restore();
 
     // Inset glass/sand tabletop with visible margin from the wooden frame.
-    const iTopL=topL+1, iTopR=topR-1, iBotL=botL+2, iBotR=botR-2, iTop=table.top+1, iBot=table.bottom-2;
+    const iTopL=topL+13, iTopR=topR-13, iBotL=botL+18, iBotR=botR-18, iTop=table.top+15, iBot=table.bottom-18;
     const sand=ctx.createLinearGradient(0,iTop,0,iBot);
     sand.addColorStop(0,'rgba(255,241,196,.86)'); sand.addColorStop(.32,'rgba(255,230,166,.92)'); sand.addColorStop(.72,'rgba(240,204,132,.90)'); sand.addColorStop(1,'rgba(222,181,104,.86)');
     ctx.beginPath(); ctx.moveTo(iTopL+14,iTop); ctx.lineTo(iTopR-14,iTop); ctx.quadraticCurveTo(iTopR,iTop,iTopR+2,iTop+14); ctx.lineTo(iBotR-2,iBot-16); ctx.quadraticCurveTo(iBotR,iBot,iBotR-16,iBot); ctx.lineTo(iBotL+16,iBot); ctx.quadraticCurveTo(iBotL,iBot,iBotL+2,iBot-16); ctx.lineTo(iTopL-2,iTop+14); ctx.quadraticCurveTo(iTopL,iTop,iTopL+14,iTop); ctx.closePath();
@@ -410,20 +405,14 @@
     rail.addColorStop(0,'rgba(255,224,171,.94)'); rail.addColorStop(.50,'rgba(216,154,88,.90)'); rail.addColorStop(1,'rgba(135,84,40,.88)');
     ctx.fillStyle=rail; ctx.strokeStyle='rgba(104,67,34,.34)'; ctx.lineWidth=2.4;
     ctx.beginPath();
-    ctx.moveTo(botL-5,table.bottom-3); ctx.lineTo(botR+5,table.bottom-3);
-    ctx.lineTo(botR+10,table.bottom+14); ctx.lineTo(botL-10,table.bottom+14); ctx.closePath();
+    ctx.moveTo(botL-8,table.bottom-5); ctx.lineTo(botR+8,table.bottom-5);
+    ctx.lineTo(botR+20,table.bottom+28); ctx.lineTo(botL-20,table.bottom+28); ctx.closePath();
     ctx.fill(); ctx.stroke();
     ctx.globalAlpha=.24; ctx.strokeStyle='#ffe7b0'; ctx.lineWidth=3;
     ctx.beginPath(); ctx.moveTo(botL-4,table.bottom+4); ctx.lineTo(botR+4,table.bottom+4); ctx.stroke();
-    ctx.globalAlpha=.55; ctx.strokeStyle='rgba(95,54,24,.60)'; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(botL+42,table.bottom+8); ctx.lineTo(botL+96,table.bottom+38); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(botR-42,table.bottom+8); ctx.lineTo(botR-96,table.bottom+38); ctx.stroke();
-    ctx.globalAlpha=1; ctx.fillStyle='rgba(126,76,34,.88)';
-    roundRect(botL+34,table.bottom+10,20,72,7,true);
-    roundRect(botR-54,table.bottom+10,20,72,7,true);
-    ctx.fillStyle='rgba(255,220,150,.24)';
-    roundRect(botL+40,table.bottom+18,5,48,3,true);
-    roundRect(botR-48,table.bottom+18,5,48,3,true);
+    ctx.globalAlpha=.40; ctx.strokeStyle='rgba(95,54,24,.50)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(botL+42,table.bottom+6); ctx.lineTo(botL+86,table.bottom+22); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(botR-42,table.bottom+6); ctx.lineTo(botR-86,table.bottom+22); ctx.stroke();
     ctx.restore();
   }
   function drawHUD(){
