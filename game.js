@@ -41,11 +41,11 @@
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
     // Gameplay-first camera: the tabletop fills the screen instead of receding into the beach.
-    table.top = h*0.250;
-    table.bottom = h*0.865;
-    table.launchY = h*0.785;
-    table.leftBottom = w*.025; table.rightBottom = w*.975;
-    table.leftTop = w*.080; table.rightTop = w*.920;
+    table.top = h*0.285;
+    table.bottom = h*0.835;
+    table.launchY = h*0.750;
+    table.leftBottom = w*.000; table.rightBottom = w*1.000;
+    table.leftTop = w*.020; table.rightTop = w*.980;
   }
 
   function xBoundsAt(y){
@@ -298,9 +298,9 @@
 
     // Outer wooden tabletop frame: broad rectangle, thinner rim, slight perspective.
     ctx.beginPath();
-    ctx.moveTo(topL-22,table.top-14); ctx.lineTo(topR+22,table.top-14);
-    ctx.lineTo(botR+24,table.bottom+22); ctx.lineTo(botR+12,table.bottom+38);
-    ctx.lineTo(botL-12,table.bottom+38); ctx.lineTo(botL-24,table.bottom+22);
+    ctx.moveTo(topL-8,table.top-5); ctx.lineTo(topR+8,table.top-5);
+    ctx.lineTo(botR+9,table.bottom+9); ctx.lineTo(botR+5,table.bottom+15);
+    ctx.lineTo(botL-5,table.bottom+15); ctx.lineTo(botL-9,table.bottom+9);
     ctx.closePath();
     const outer=ctx.createLinearGradient(0,table.top-18,0,table.bottom+42);
     outer.addColorStop(0,'#ffecbf'); outer.addColorStop(.34,'#f1cc88'); outer.addColorStop(.72,'#d09a59'); outer.addColorStop(1,'#925a2d');
@@ -319,8 +319,8 @@
     // Darker side faces make the wooden frame read as a 3D object.
     ctx.save();
     ctx.fillStyle='rgba(111,69,33,.30)';
-    ctx.beginPath(); ctx.moveTo(topL-20,table.top-10); ctx.lineTo(topL-8,table.top+2); ctx.lineTo(botL-12,table.bottom+18); ctx.lineTo(botL-28,table.bottom+24); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(topR+20,table.top-10); ctx.lineTo(topR+8,table.top+2); ctx.lineTo(botR+12,table.bottom+18); ctx.lineTo(botR+28,table.bottom+24); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(topL-16,table.top-8); ctx.lineTo(topL-6,table.top+2); ctx.lineTo(botL-9,table.bottom+14); ctx.lineTo(botL-22,table.bottom+18); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(topR+16,table.top-8); ctx.lineTo(topR+6,table.top+2); ctx.lineTo(botR+9,table.bottom+14); ctx.lineTo(botR+22,table.bottom+18); ctx.closePath(); ctx.fill();
     ctx.restore();
     // Visible lower leg sections below the chunky near rail.
     ctx.save();
@@ -338,8 +338,8 @@
 
     // Inner lighter bevel, separated from the glass inset.
     ctx.beginPath();
-    ctx.moveTo(topL-14,table.top-6); ctx.lineTo(topR+14,table.top-6);
-    ctx.lineTo(botR+20,table.bottom+12); ctx.lineTo(botL-20,table.bottom+12); ctx.closePath();
+    ctx.moveTo(topL-4,table.top-2); ctx.lineTo(topR+4,table.top-2);
+    ctx.lineTo(botR+6,table.bottom+4); ctx.lineTo(botL-6,table.bottom+4); ctx.closePath();
     const bevel=ctx.createLinearGradient(0,table.top,0,table.bottom+18);
     bevel.addColorStop(0,'#fff0c6'); bevel.addColorStop(.52,'#ecc68d'); bevel.addColorStop(1,'#c99661');
     ctx.fillStyle=bevel; ctx.fill(); ctx.strokeStyle='rgba(122,78,37,.18)'; ctx.lineWidth=2; ctx.stroke();
@@ -348,10 +348,10 @@
     ctx.restore();
 
     // Inset glass/sand tabletop with visible margin from the wooden frame.
-    const iTopL=topL+13, iTopR=topR-13, iBotL=botL+18, iBotR=botR-18, iTop=table.top+15, iBot=table.bottom-18;
+    const iTopL=topL+2, iTopR=topR-2, iBotL=botL+3, iBotR=botR-3, iTop=table.top+3, iBot=table.bottom-5;
     const sand=ctx.createLinearGradient(0,iTop,0,iBot);
     sand.addColorStop(0,'rgba(255,241,196,.86)'); sand.addColorStop(.32,'rgba(255,230,166,.92)'); sand.addColorStop(.72,'rgba(240,204,132,.90)'); sand.addColorStop(1,'rgba(222,181,104,.86)');
-    ctx.beginPath(); ctx.moveTo(iTopL+14,iTop); ctx.lineTo(iTopR-14,iTop); ctx.quadraticCurveTo(iTopR,iTop,iTopR+2,iTop+14); ctx.lineTo(iBotR-2,iBot-16); ctx.quadraticCurveTo(iBotR,iBot,iBotR-16,iBot); ctx.lineTo(iBotL+16,iBot); ctx.quadraticCurveTo(iBotL,iBot,iBotL+2,iBot-16); ctx.lineTo(iTopL-2,iTop+14); ctx.quadraticCurveTo(iTopL,iTop,iTopL+14,iTop); ctx.closePath();
+    ctx.beginPath(); ctx.moveTo(iTopL+5,iTop); ctx.lineTo(iTopR-5,iTop); ctx.quadraticCurveTo(iTopR,iTop,iTopR+1,iTop+5); ctx.lineTo(iBotR-1,iBot-7); ctx.quadraticCurveTo(iBotR,iBot,iBotR-7,iBot); ctx.lineTo(iBotL+7,iBot); ctx.quadraticCurveTo(iBotL,iBot,iBotL+1,iBot-7); ctx.lineTo(iTopL-1,iTop+5); ctx.quadraticCurveTo(iTopL,iTop,iTopL+5,iTop); ctx.closePath();
     ctx.fillStyle=sand; ctx.fill();
     ctx.save(); ctx.clip();
     const aoTop=ctx.createLinearGradient(0,iTop,0,iTop+72); aoTop.addColorStop(0,'rgba(58,37,18,.48)'); aoTop.addColorStop(1,'rgba(87,61,32,0)'); ctx.fillStyle=aoTop; ctx.fillRect(0,iTop,state.w,66);
@@ -405,24 +405,27 @@
     rail.addColorStop(0,'rgba(255,224,171,.94)'); rail.addColorStop(.50,'rgba(216,154,88,.90)'); rail.addColorStop(1,'rgba(135,84,40,.88)');
     ctx.fillStyle=rail; ctx.strokeStyle='rgba(104,67,34,.34)'; ctx.lineWidth=2.4;
     ctx.beginPath();
-    ctx.moveTo(botL-8,table.bottom-5); ctx.lineTo(botR+8,table.bottom-5);
-    ctx.lineTo(botR+20,table.bottom+28); ctx.lineTo(botL-20,table.bottom+28); ctx.closePath();
+    ctx.moveTo(botL-6,table.bottom-4); ctx.lineTo(botR+6,table.bottom-4);
+    ctx.lineTo(botR+14,table.bottom+20); ctx.lineTo(botL-14,table.bottom+20); ctx.closePath();
     ctx.fill(); ctx.stroke();
     ctx.globalAlpha=.24; ctx.strokeStyle='#ffe7b0'; ctx.lineWidth=3;
     ctx.beginPath(); ctx.moveTo(botL-4,table.bottom+4); ctx.lineTo(botR+4,table.bottom+4); ctx.stroke();
     ctx.globalAlpha=.40; ctx.strokeStyle='rgba(95,54,24,.50)'; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(botL+42,table.bottom+6); ctx.lineTo(botL+86,table.bottom+22); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(botR-42,table.bottom+6); ctx.lineTo(botR-86,table.bottom+22); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(botL+34,table.bottom+5); ctx.lineTo(botL+78,table.bottom+20); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(botR-34,table.bottom+5); ctx.lineTo(botR-78,table.bottom+20); ctx.stroke();
+    ctx.globalAlpha=.34; ctx.strokeStyle='rgba(92,55,25,.55)'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(topL+12,table.top+24); ctx.lineTo(botL+28,table.bottom-8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(topR-12,table.top+24); ctx.lineTo(botR-28,table.bottom-8); ctx.stroke();
     ctx.restore();
   }
   function drawHUD(){
     const w=state.w, h=state.h;
     const coinX=w*.18, coinY=h*.055;
     roundRect(coinX-62,coinY-17,124,34,17,true,'rgba(255,255,255,.94)','#8a572b',2); drawCoin(coinX-42,coinY,12); text(Math.round(state.displayCoins),coinX-20,coinY+4,19,'#7a3b18','left','bold');
-    const nx=w*.660, ny=h*.080;
-    roundRect(nx-33,ny-7,66,78,13,true,'rgba(255,248,219,.9)','#8a572b',2); drawDrinkIcon(state.nextLvl,nx,ny+24,.64); text('下一個',nx,ny+58,13,'#7a3b18','center','bold');
-    const ox=w*.255, oy=h*.195;
-    drawOrder(ox,oy,state.orders[0],0,.78); drawOrder(ox+76,oy+3,state.orders[1],1,.78);
+    const nx=w*.840, ny=h*.064;
+    roundRect(nx-29,ny-5,58,68,12,true,'rgba(255,248,219,.92)','#8a572b',1.8); drawDrinkIcon(state.nextLvl,nx,ny+21,.54); text('下一個',nx,ny+51,11,'#7a3b18','center','bold');
+    const ox=w*.175, oy=h*.096;
+    drawOrder(ox,oy,state.orders[0],0,.55); drawOrder(ox+54,oy+2,state.orders[1],1,.55);
   }
   function drawOrder(x,y,o,i,s=1){
     const active=i>=state.orderIndex && !o.done, a=o.done?.5:(active?1:.72); ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.scale(s,s);
@@ -444,16 +447,16 @@
     ctx.restore();
   }
   function drawQueue(){
-    const w=state.w,h=state.h,rowY=h*.895, btnY=h*.965;
-    roundRect(w*.080,rowY-18,w*.25,36,18,true,'rgba(255,255,255,.92)','#7b4a27',2.5);
+    const w=state.w,h=state.h,rowY=h*.865, btnY=h*.986;
+    roundRect(w*.075,rowY-16,w*.19,32,16,true,'rgba(255,255,255,.92)','#7b4a27',2.2);
     for(let i=0;i<2;i++){
-      const x=w*.145+i*w*.090;
-      drawDrinkIcon(Math.min(i,8),x,rowY,.255+i*.016);
-      if(i<1){ ctx.strokeStyle='rgba(108,70,38,.30)'; ctx.lineWidth=1.7; ctx.beginPath(); ctx.moveTo(x+14,rowY); ctx.lineTo(x+w*.090-14,rowY); ctx.stroke(); }
+      const x=w*.125+i*w*.075;
+      drawDrinkIcon(Math.min(i,8),x,rowY,.230+i*.014);
+      if(i<1){ ctx.strokeStyle='rgba(108,70,38,.30)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x+12,rowY); ctx.lineTo(x+w*.075-12,rowY); ctx.stroke(); }
     }
-    const bx=w*.600, bw=w*.330;
-    roundRect(bx,btnY-17,bw,34,12,true,'#42c955','#1b7d2b',2.3); text('下載',bx+bw/2,btnY+1,16,'#fff','center','bold','#126320');
-    text('Tasty Travels',w*.17,h*.982,13,'#fff','center','bold','#185c5f');
+    const bx=w*.715, bw=w*.205;
+    roundRect(bx,btnY-11,bw,22,10,true,'#42c955','#1b7d2b',2); text('下載',bx+bw/2,btnY+1,12,'#fff','center','bold','#126320');
+    text('Tasty Travels',w*.16,h*.985,12,'#fff','center','bold','#185c5f');
   }
   function drawItem(it){
     if(it.aim){ ctx.save(); ctx.translate(it.x,it.y); ctx.rotate(it.norm*.24); ctx.globalAlpha=.22; ctx.strokeStyle='rgba(255,255,255,.75)'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,-it.radius*.80); ctx.lineTo(0,-Math.max(56,state.h*.085)); ctx.stroke(); ctx.restore(); }
