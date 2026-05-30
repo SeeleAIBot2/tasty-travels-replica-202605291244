@@ -414,13 +414,13 @@
     const w=state.w, h=state.h;
     const coinX=w*.18, coinY=h*.055;
     roundRect(coinX-62,coinY-17,124,34,17,true,'rgba(255,255,255,.94)','#8a572b',2); drawCoin(coinX-42,coinY,12); text(Math.round(state.displayCoins),coinX-20,coinY+4,19,'#7a3b18','left','bold');
-    const nx=w*.745, ny=h*.080;
+    const nx=w*.660, ny=h*.080;
     roundRect(nx-33,ny-7,66,78,13,true,'rgba(255,248,219,.9)','#8a572b',2); drawDrinkIcon(state.nextLvl,nx,ny+24,.64); text('下一個',nx,ny+58,13,'#7a3b18','center','bold');
-    const ox=w*.285, oy=h*.195;
-    drawOrder(ox,oy,state.orders[0],0); drawOrder(ox+86,oy+3,state.orders[1],1);
+    const ox=w*.255, oy=h*.195;
+    drawOrder(ox,oy,state.orders[0],0,.78); drawOrder(ox+76,oy+3,state.orders[1],1,.78);
   }
-  function drawOrder(x,y,o,i){
-    const active=i>=state.orderIndex && !o.done, a=o.done?.5:(active?1:.72); ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y);
+  function drawOrder(x,y,o,i,s=1){
+    const active=i>=state.orderIndex && !o.done, a=o.done?.5:(active?1:.72); ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.scale(s,s);
     ctx.save(); ctx.shadowColor='rgba(92,51,22,.26)'; ctx.shadowBlur=10; ctx.shadowOffsetY=4;
     roundRect(-48,-38,96,110,12,true,'#fff4d2','#9d5527',1.8);
     ctx.restore();
@@ -430,7 +430,7 @@
     ctx.globalAlpha=1; ctx.fillStyle='rgba(132,78,32,.12)'; ctx.fillRect(-38,-14,76,2); ctx.fillRect(-36,48,72,2);
     ctx.restore();
     roundRect(-34,-30,68,18,8,true,'rgba(255,235,174,.55)','rgba(151,85,37,.20)',1);
-    text('外帶訂單',0,-21,13,'#753518','center','bold');
+    text('外帶訂單',0,-21,14,'#753518','center','bold');
     text('Food  Travel',0,-6,7,'rgba(141,82,38,.38)','center','');
     drawDrinkIcon(o.lvl,0,29,.73);
     roundRect(-29,49,58,21,10,true,'rgba(255,238,176,.92)','#c3832b',1.4);
@@ -439,15 +439,15 @@
     ctx.restore();
   }
   function drawQueue(){
-    const w=state.w,h=state.h,y=h*.942;
-    roundRect(w*.065,y-18,w*.39,36,18,true,'rgba(255,255,255,.92)','#7b4a27',2.5);
-    for(let i=0;i<4;i++){
-      const x=w*.125+i*w*.088;
-      drawDrinkIcon(Math.min(i,8),x,y,.265+i*.018);
-      if(i<3){ ctx.strokeStyle='rgba(108,70,38,.30)'; ctx.lineWidth=1.7; ctx.beginPath(); ctx.moveTo(x+14,y); ctx.lineTo(x+w*.088-14,y); ctx.stroke(); }
+    const w=state.w,h=state.h,rowY=h*.895, btnY=h*.965;
+    roundRect(w*.080,rowY-18,w*.25,36,18,true,'rgba(255,255,255,.92)','#7b4a27',2.5);
+    for(let i=0;i<2;i++){
+      const x=w*.145+i*w*.090;
+      drawDrinkIcon(Math.min(i,8),x,rowY,.255+i*.016);
+      if(i<1){ ctx.strokeStyle='rgba(108,70,38,.30)'; ctx.lineWidth=1.7; ctx.beginPath(); ctx.moveTo(x+14,rowY); ctx.lineTo(x+w*.090-14,rowY); ctx.stroke(); }
     }
-    const bx=w*.820, bw=w*.125;
-    roundRect(bx,y-18,bw,36,12,true,'#42c955','#1b7d2b',2.3); text('下載',bx+bw/2,y+1,15,'#fff','center','bold','#126320');
+    const bx=w*.600, bw=w*.330;
+    roundRect(bx,btnY-17,bw,34,12,true,'#42c955','#1b7d2b',2.3); text('下載',bx+bw/2,btnY+1,16,'#fff','center','bold','#126320');
     text('Tasty Travels',w*.17,h*.982,13,'#fff','center','bold','#185c5f');
   }
   function drawItem(it){
