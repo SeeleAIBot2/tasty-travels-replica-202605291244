@@ -40,12 +40,12 @@
 
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
-    // Original-style beach-table camera: dominant near rail, narrower far edge, clear seaside backdrop.
-    table.top = h*0.335;
-    table.bottom = h*0.845;
-    table.launchY = h*0.755;
-    table.leftBottom = w*.060; table.rightBottom = w*.940;
-    table.leftTop = w*.155; table.rightTop = w*.845;
+    // Original-style beach-table camera: high-angle tabletop with a wide near rail and compressed far edge.
+    table.top = h*0.360;
+    table.bottom = h*0.855;
+    table.launchY = h*0.765;
+    table.leftBottom = w*.075; table.rightBottom = w*.925;
+    table.leftTop = w*.215; table.rightTop = w*.785;
   }
 
   function xBoundsAt(y){
@@ -280,20 +280,25 @@
   function drawTable(){
     const topL=table.leftTop, topR=table.rightTop, botL=table.leftBottom, botR=table.rightBottom;
     const h=state.h;
-    // Soft contact shadow anchors the tray into the beach instead of floating like a UI panel.
+    // Layered cast shadows: the tray sits above the sand, with weight strongest under the near rail.
     ctx.save();
-    ctx.fillStyle='rgba(83,50,23,.22)';
-    ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.bottom+34,(botR-botL)*.58,42,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='rgba(112,75,38,.075)'; ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.top+160,(botR-botL)*.55,130,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(74,43,19,.18)';
+    ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.bottom+46,(botR-botL)*.52,36,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(84,48,21,.12)';
+    ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.bottom+14,(botR-botL)*.48,18,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(112,75,38,.055)'; ctx.beginPath(); ctx.ellipse((topL+topR)/2,table.top+110,(topR-topL)*.68,105,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
-    // Only a hint of legs is visible; camera is pushed in toward the playable tabletop.
+    // Legs are behind the front rail: visible only as short vertical supports below the elevated tabletop.
     ctx.save();
-    ctx.fillStyle='#b5753b';
-    roundRect(botL+44,table.bottom+9,22,h*.045,8,true);
-    roundRect(botR-66,table.bottom+9,22,h*.045,8,true);
-    ctx.fillStyle='rgba(255,226,159,.25)';
-    roundRect(botL+50,table.bottom+16,5,h*.030,3,true);
-    roundRect(botR-60,table.bottom+16,5,h*.030,3,true);
+    ctx.fillStyle='rgba(96,56,27,.58)';
+    roundRect(botL+52,table.bottom+16,20,h*.047,7,true);
+    roundRect(botR-72,table.bottom+16,20,h*.047,7,true);
+    ctx.fillStyle='rgba(255,224,159,.18)';
+    roundRect(botL+58,table.bottom+20,4,h*.030,3,true);
+    roundRect(botR-66,table.bottom+20,4,h*.030,3,true);
+    ctx.fillStyle='rgba(66,38,18,.16)';
+    ctx.beginPath(); ctx.ellipse(botL+62,table.bottom+64,34,9,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(botR-62,table.bottom+64,34,9,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
 
     // Outer wooden tabletop frame: broad rectangle, thinner rim, slight perspective.
@@ -316,24 +321,25 @@
     for(let k=0;k<14;k++){ const y=lerp(table.top,table.bottom+40,(k*23%100)/100), b=xBoundsAt(clamp(y,table.top,table.bottom)); const x=lerp(b.l-40,b.r+40,(k*41%100)/100); ctx.globalAlpha=.16; ctx.strokeStyle='#7a461f'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(x,y,10+(k%3)*4,4+(k%2)*2,.4,0,Math.PI*2); ctx.stroke(); }
     ctx.restore();
     ctx.globalAlpha=1;
-    // Darker side faces make the wooden frame read as a 3D object.
+    // Side thickness and underside shadows establish front/back/up/down instead of a flat pasted trapezoid.
     ctx.save();
-    ctx.fillStyle='rgba(111,69,33,.30)';
-    ctx.beginPath(); ctx.moveTo(topL-16,table.top-8); ctx.lineTo(topL-6,table.top+2); ctx.lineTo(botL-9,table.bottom+14); ctx.lineTo(botL-22,table.bottom+18); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(topR+16,table.top-8); ctx.lineTo(topR+6,table.top+2); ctx.lineTo(botR+9,table.bottom+14); ctx.lineTo(botR+22,table.bottom+18); ctx.closePath(); ctx.fill();
-    ctx.restore();
-    // Visible lower leg sections below the chunky near rail.
-    ctx.save();
-    ctx.fillStyle='rgba(95,54,26,.22)';
-    roundRect(botL+96,table.bottom+42,34,h*.040,9,true);
-    roundRect(botR-130,table.bottom+42,34,h*.040,9,true);
+    const leftFace=ctx.createLinearGradient(topL-30,table.top,botL-18,table.bottom);
+    leftFace.addColorStop(0,'rgba(191,128,62,.36)'); leftFace.addColorStop(1,'rgba(74,43,20,.48)');
+    ctx.fillStyle=leftFace;
+    ctx.beginPath(); ctx.moveTo(topL-20,table.top-4); ctx.lineTo(topL-5,table.top+8); ctx.lineTo(botL-3,table.bottom+20); ctx.lineTo(botL-24,table.bottom+30); ctx.closePath(); ctx.fill();
+    const rightFace=ctx.createLinearGradient(topR+30,table.top,botR+18,table.bottom);
+    rightFace.addColorStop(0,'rgba(180,112,52,.32)'); rightFace.addColorStop(1,'rgba(70,40,18,.50)');
+    ctx.fillStyle=rightFace;
+    ctx.beginPath(); ctx.moveTo(topR+20,table.top-4); ctx.lineTo(topR+5,table.top+8); ctx.lineTo(botR+3,table.bottom+20); ctx.lineTo(botR+24,table.bottom+30); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='rgba(54,31,14,.22)';
+    ctx.beginPath(); ctx.moveTo(botL+18,table.bottom+16); ctx.lineTo(botR-18,table.bottom+16); ctx.lineTo(botR-4,table.bottom+34); ctx.lineTo(botL+4,table.bottom+34); ctx.closePath(); ctx.fill();
     ctx.restore();
 
-    // Side cast shadows help benches read as below the tabletop, not pasted on top.
+    // Side benches stay behind/beside the table; their shadows tuck under the tabletop edge.
     ctx.save();
-    ctx.fillStyle='rgba(65,39,19,.30)';
-    ctx.beginPath(); ctx.moveTo(topL-42,table.top-8); ctx.lineTo(topL-8,table.top+4); ctx.lineTo(botL-18,table.bottom+24); ctx.lineTo(botL-48,table.bottom+30); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(topR+42,table.top-8); ctx.lineTo(topR+8,table.top+4); ctx.lineTo(botR+18,table.bottom+24); ctx.lineTo(botR+48,table.bottom+30); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='rgba(68,40,19,.22)';
+    ctx.beginPath(); ctx.moveTo(topL-46,table.top+4); ctx.lineTo(topL-18,table.top+16); ctx.lineTo(botL-18,table.bottom+18); ctx.lineTo(botL-54,table.bottom+28); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(topR+46,table.top+4); ctx.lineTo(topR+18,table.top+16); ctx.lineTo(botR+18,table.bottom+18); ctx.lineTo(botR+54,table.bottom+28); ctx.closePath(); ctx.fill();
     ctx.restore();
 
     // Inner lighter bevel, separated from the glass inset.
@@ -402,15 +408,17 @@
 
     // Front rail and support planks give it the structure of a real seaside table.
     ctx.save();
-    const rail=ctx.createLinearGradient(0,table.bottom-5,0,table.bottom+20);
-    rail.addColorStop(0,'rgba(255,224,171,.94)'); rail.addColorStop(.50,'rgba(216,154,88,.90)'); rail.addColorStop(1,'rgba(135,84,40,.88)');
-    ctx.fillStyle=rail; ctx.strokeStyle='rgba(104,67,34,.34)'; ctx.lineWidth=2.4;
+    const rail=ctx.createLinearGradient(0,table.bottom-7,0,table.bottom+30);
+    rail.addColorStop(0,'rgba(255,231,185,.98)'); rail.addColorStop(.36,'rgba(221,157,83,.96)'); rail.addColorStop(.72,'rgba(151,89,40,.94)'); rail.addColorStop(1,'rgba(80,47,23,.92)');
+    ctx.fillStyle=rail; ctx.strokeStyle='rgba(91,54,24,.42)'; ctx.lineWidth=2.6;
     ctx.beginPath();
-    ctx.moveTo(botL-6,table.bottom-4); ctx.lineTo(botR+6,table.bottom-4);
-    ctx.lineTo(botR+14,table.bottom+20); ctx.lineTo(botL-14,table.bottom+20); ctx.closePath();
+    ctx.moveTo(botL-11,table.bottom-8); ctx.lineTo(botR+11,table.bottom-8);
+    ctx.lineTo(botR+18,table.bottom+27); ctx.lineTo(botL-18,table.bottom+27); ctx.closePath();
     ctx.fill(); ctx.stroke();
-    ctx.globalAlpha=.24; ctx.strokeStyle='#ffe7b0'; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(botL-4,table.bottom+4); ctx.lineTo(botR+4,table.bottom+4); ctx.stroke();
+    ctx.fillStyle='rgba(53,30,13,.18)';
+    ctx.beginPath(); ctx.moveTo(botL+8,table.bottom+24); ctx.lineTo(botR-8,table.bottom+24); ctx.lineTo(botR-22,table.bottom+35); ctx.lineTo(botL+22,table.bottom+35); ctx.closePath(); ctx.fill();
+    ctx.globalAlpha=.32; ctx.strokeStyle='#ffe9b8'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(botL-4,table.bottom+1); ctx.lineTo(botR+4,table.bottom+1); ctx.stroke();
     ctx.globalAlpha=.40; ctx.strokeStyle='rgba(95,54,24,.50)'; ctx.lineWidth=3;
     ctx.beginPath(); ctx.moveTo(botL+34,table.bottom+5); ctx.lineTo(botL+78,table.bottom+20); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(botR-34,table.bottom+5); ctx.lineTo(botR-78,table.bottom+20); ctx.stroke();
