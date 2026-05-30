@@ -260,28 +260,6 @@
     ctx.fillStyle='rgba(177,122,74,.18)'; for(let i=0;i<22;i++){ ctx.beginPath(); ctx.ellipse((i*83)%w, h*(.58+(i%6)*.058), 12+(i%3)*5, 6+(i%2)*3, .5, 0, Math.PI*2); ctx.fill(); }
     ctx.globalAlpha=.56; drawShell(w*.11,h*.705,.34,-.35); drawStarfish(w*.88,h*.645,.30,.28); drawPebble(w*.76,h*.595,.22,'rgba(116,92,70,.18)'); ctx.globalAlpha=1;
 
-    // Original-game tropical foreground: soft canopy and palms frame the table without becoming UI.
-    ctx.save();
-    ctx.globalAlpha=.78;
-    const thatch=ctx.createLinearGradient(0,0,0,h*.19);
-    thatch.addColorStop(0,'#6f7d31'); thatch.addColorStop(.45,'#a9bd49'); thatch.addColorStop(1,'rgba(111,126,42,.10)');
-    ctx.fillStyle=thatch;
-    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(w,0); ctx.lineTo(w,h*.108);
-    for(let i=0;i<22;i++){ const x=w*(1-i/21), y=h*(.130+.030*Math.sin(i*.9)); ctx.lineTo(x,y); }
-    ctx.closePath(); ctx.fill();
-    ctx.strokeStyle='rgba(93,60,31,.42)'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(0,h*.105); ctx.bezierCurveTo(w*.25,h*.137,w*.68,h*.128,w,h*.104); ctx.stroke();
-    ctx.globalAlpha=.46; ctx.strokeStyle='rgba(74,52,24,.38)'; ctx.lineWidth=7;
-    [w*.17,w*.42,w*.66,w*.89].forEach(x=>{ ctx.beginPath(); ctx.moveTo(x,-10); ctx.lineTo(x-12,h*.135); ctx.stroke(); });
-    ctx.globalAlpha=.72;
-    function palm(cx,flip=1){
-      ctx.save(); ctx.translate(cx,h*.235); ctx.scale(flip,1);
-      ctx.strokeStyle='rgba(116,78,43,.66)'; ctx.lineWidth=10; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,h*.110); ctx.quadraticCurveTo(10,-8,42,-52); ctx.stroke();
-      ctx.fillStyle='rgba(111,163,55,.68)';
-      for(let i=0;i<7;i++){ ctx.save(); ctx.rotate(-.95+i*.31); ctx.beginPath(); ctx.moveTo(35,-48); ctx.quadraticCurveTo(78,-72,122,-56); ctx.quadraticCurveTo(76,-48,35,-48); ctx.fill(); ctx.restore(); }
-      ctx.restore();
-    }
-    palm(w*.11,1); palm(w*.89,-1);
-    ctx.restore();
   }
   function drawPosts(){ const w=state.w,h=state.h; ctx.fillStyle='#7a4d2c'; [w*.13,w*.87].forEach(x=>{ roundRect(x-10,h*.08,20,h*.60,8,true); ctx.fillStyle='#9f6738'; roundRect(x-5,h*.08,7,h*.60,4,true); ctx.fillStyle='#7a4d2c'; }); }
   function drawBenches(){}
@@ -324,28 +302,6 @@
     ctx.beginPath(); ctx.ellipse(botR-62,table.bottom+64,34,9,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
 
-    // Side wooden benches from the original reference: solid planks behind the tabletop, not transparent walls.
-    ctx.save();
-    function sideBench(side){
-      const sign=side==='left'?-1:1;
-      const xFar=side==='left'?topL-state.w*.205:topR+state.w*.205;
-      const xNear=side==='left'?botL-state.w*.185:botR+state.w*.185;
-      const innerFar=side==='left'?topL-state.w*.070:topR+state.w*.070;
-      const innerNear=side==='left'?botL-state.w*.058:botR+state.w*.058;
-      const yFar=table.top+h*.045, yNear=table.bottom-h*.090;
-      ctx.fillStyle='rgba(80,44,20,.16)';
-      ctx.beginPath(); ctx.moveTo(xFar+sign*8,yFar+8); ctx.lineTo(innerFar+sign*8,yFar+16); ctx.lineTo(innerNear+sign*14,yNear+18); ctx.lineTo(xNear+sign*14,yNear+16); ctx.closePath(); ctx.fill();
-      const g=ctx.createLinearGradient(0,yFar,0,yNear);
-      g.addColorStop(0,'rgba(241,190,111,.86)'); g.addColorStop(.55,'rgba(207,139,67,.88)'); g.addColorStop(1,'rgba(143,82,40,.86)');
-      ctx.fillStyle=g; ctx.strokeStyle='rgba(92,55,27,.30)'; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.moveTo(xFar,yFar); ctx.lineTo(innerFar,yFar+10); ctx.lineTo(innerNear,yNear); ctx.lineTo(xNear,yNear-2); ctx.closePath(); ctx.fill(); ctx.stroke();
-      ctx.globalAlpha=.28; ctx.strokeStyle='rgba(255,229,169,.78)'; ctx.lineWidth=2;
-      for(let k=0;k<3;k++){ const t=(k+1)/4; ctx.beginPath(); ctx.moveTo(lerp(xFar,innerFar,t),yFar+8); ctx.lineTo(lerp(xNear,innerNear,t),yNear-5); ctx.stroke(); }
-      ctx.globalAlpha=.22; ctx.strokeStyle='rgba(87,48,22,.75)'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo((xFar+innerFar)/2,yFar+20); ctx.lineTo((xNear+innerNear)/2,yNear-18); ctx.stroke();
-      ctx.globalAlpha=1;
-    }
-    sideBench('left'); sideBench('right');
-    ctx.restore();
 
     // Outer wooden tabletop frame: broad original-like tray frame with strong perspective.
     ctx.beginPath();
