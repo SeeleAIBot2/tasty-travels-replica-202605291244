@@ -414,13 +414,13 @@
     const w=state.w, h=state.h;
     const coinX=w*.18, coinY=h*.055;
     roundRect(coinX-62,coinY-17,124,34,17,true,'rgba(255,255,255,.94)','#8a572b',2); drawCoin(coinX-42,coinY,12); text(Math.round(state.displayCoins),coinX-20,coinY+4,19,'#7a3b18','left','bold');
-    const nx=w*.82, ny=h*.075;
-    roundRect(nx-35,ny-8,70,82,14,true,'rgba(255,248,219,.9)','#8a572b',2); drawDrinkIcon(state.nextLvl,nx,ny+25,.74); text('下一個',nx,ny+61,15,'#7a3b18','center','bold');
-    const ox=w*.38, oy=h*.195;
-    drawOrder(ox,oy,state.orders[0],0); drawOrder(ox+92,oy+3,state.orders[1],1);
+    const nx=w*.745, ny=h*.080;
+    roundRect(nx-33,ny-7,66,78,13,true,'rgba(255,248,219,.9)','#8a572b',2); drawDrinkIcon(state.nextLvl,nx,ny+24,.64); text('下一個',nx,ny+58,13,'#7a3b18','center','bold');
+    const ox=w*.285, oy=h*.195;
+    drawOrder(ox,oy,state.orders[0],0); drawOrder(ox+86,oy+3,state.orders[1],1);
   }
   function drawOrder(x,y,o,i){
-    const active=i>=state.orderIndex && !o.done, a=o.done?.5:(active?1:.72); ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.rotate((i?1:-1)*.035);
+    const active=i>=state.orderIndex && !o.done, a=o.done?.5:(active?1:.72); ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y);
     ctx.save(); ctx.shadowColor='rgba(92,51,22,.26)'; ctx.shadowBlur=10; ctx.shadowOffsetY=4;
     roundRect(-48,-38,96,110,12,true,'#fff4d2','#9d5527',1.8);
     ctx.restore();
@@ -439,15 +439,16 @@
     ctx.restore();
   }
   function drawQueue(){
-    const w=state.w,h=state.h,y=h*.925;
-    roundRect(w*.08,y-22,w*.58,44,22,true,'rgba(255,255,255,.92)','#7b4a27',3);
-    for(let i=0;i<6;i++){
-      const x=w*.135+i*w*.092;
-      drawDrinkIcon(Math.min(i,8),x,y,.31+i*.022);
-      if(i<5){ ctx.strokeStyle='rgba(108,70,38,.38)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x+17,y); ctx.lineTo(x+w*.092-17,y); ctx.stroke(); }
+    const w=state.w,h=state.h,y=h*.942;
+    roundRect(w*.065,y-18,w*.39,36,18,true,'rgba(255,255,255,.92)','#7b4a27',2.5);
+    for(let i=0;i<4;i++){
+      const x=w*.125+i*w*.088;
+      drawDrinkIcon(Math.min(i,8),x,y,.265+i*.018);
+      if(i<3){ ctx.strokeStyle='rgba(108,70,38,.30)'; ctx.lineWidth=1.7; ctx.beginPath(); ctx.moveTo(x+14,y); ctx.lineTo(x+w*.088-14,y); ctx.stroke(); }
     }
-    roundRect(w*.73,y-28,w*.22,56,15,true,'#42c955','#1b7d2b',3); text('下载',w*.84,y+2,20,'#fff','center','bold','#126320');
-    text('Tasty Travels',w*.17,h*.975,16,'#fff','center','bold','#185c5f');
+    const bx=w*.820, bw=w*.125;
+    roundRect(bx,y-18,bw,36,12,true,'#42c955','#1b7d2b',2.3); text('下載',bx+bw/2,y+1,15,'#fff','center','bold','#126320');
+    text('Tasty Travels',w*.17,h*.982,13,'#fff','center','bold','#185c5f');
   }
   function drawItem(it){
     if(it.aim){ ctx.save(); ctx.translate(it.x,it.y); ctx.rotate(it.norm*.30); ctx.strokeStyle='rgba(255,255,255,.98)'; ctx.lineWidth=5; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,-it.radius*.95); ctx.lineTo(0,-Math.max(150,state.h*.25)); ctx.stroke(); ctx.restore(); }
@@ -598,7 +599,7 @@
   function drawEnd(){ ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(0,0,state.w,state.h); text('试玩完成',state.w/2,state.h*.42,42,'#fff','center','bold'); text('点击任意位置重新开始',state.w/2,state.h*.50,22,'#fff','center','bold'); }
   function drawCoin(x,y,r){ ctx.fillStyle='#ffc83d'; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='#b56a00'; ctx.lineWidth=2; ctx.stroke(); ctx.fillStyle='#fff2a5'; ctx.beginPath(); ctx.arc(x-r*.25,y-r*.3,r*.25,0,Math.PI*2); ctx.fill(); }
   function roundRect(x,y,w,h,r,fill=true,fs,ss,lw){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); if(fs) ctx.fillStyle=fs; if(fill) ctx.fill(); if(ss){ ctx.strokeStyle=ss; ctx.lineWidth=lw||1; ctx.stroke(); } }
-  function text(str,x,y,size,color,align='left',weight='',stroke){ ctx.save(); ctx.font=`${weight} ${size}px Arial`; ctx.textAlign=align; ctx.textBaseline='middle'; if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=5; for(const [k,line] of String(str).split('\n').entries()) ctx.strokeText(line,x,y+k*size*1.05); } ctx.fillStyle=color; for(const [k,line] of String(str).split('\n').entries()) ctx.fillText(line,x,y+k*size*1.05); ctx.restore(); }
+  function text(str,x,y,size,color,align='left',weight='',stroke){ ctx.save(); ctx.font=`${weight} ${size}px "PingFang TC", "PingFang SC", "Noto Sans CJK TC", Arial, sans-serif`; ctx.textAlign=align; ctx.textBaseline='middle'; if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=5; for(const [k,line] of String(str).split('\n').entries()) ctx.strokeText(line,x,y+k*size*1.05); } ctx.fillStyle=color; for(const [k,line] of String(str).split('\n').entries()) ctx.fillText(line,x,y+k*size*1.05); ctx.restore(); }
 
   function reset(){ state.items=[]; state.particles=[]; state.floating=[]; state.coins=0; state.displayCoins=0; state.seqIndex=0; state.highestUnlocked=0; state.nextLvl=rollSpawnLevel(); state.orderIndex=0; state.ended=false; state.orders.forEach(o=>o.done=false); spawnCurrent(); }
   let last=performance.now(); function loop(now){ const dt=Math.min(.033,(now-last)/1000); last=now; update(dt); draw(); requestAnimationFrame(loop); }
