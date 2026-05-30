@@ -40,12 +40,12 @@
 
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
-    // Original-style beach-table camera: table starts higher, with a broad near rail and strongly narrowed far edge.
-    table.top = h*0.315;
-    table.bottom = h*0.845;
-    table.launchY = h*0.755;
-    table.leftBottom = w*.060; table.rightBottom = w*.940;
-    table.leftTop = w*.240; table.rightTop = w*.760;
+    // Original-style beach-table camera: flatter high-angle view, broad tray, limited corridor feeling.
+    table.top = h*0.305;
+    table.bottom = h*0.825;
+    table.launchY = h*0.735;
+    table.leftBottom = w*.035; table.rightBottom = w*.965;
+    table.leftTop = w*.150; table.rightTop = w*.850;
   }
 
   function xBoundsAt(y){
@@ -328,10 +328,10 @@
     ctx.save();
     function sideBench(side){
       const sign=side==='left'?-1:1;
-      const xFar=side==='left'?topL-state.w*.145:topR+state.w*.145;
-      const xNear=side==='left'?botL-state.w*.135:botR+state.w*.135;
-      const innerFar=side==='left'?topL-state.w*.035:topR+state.w*.035;
-      const innerNear=side==='left'?botL-state.w*.030:botR+state.w*.030;
+      const xFar=side==='left'?topL-state.w*.205:topR+state.w*.205;
+      const xNear=side==='left'?botL-state.w*.185:botR+state.w*.185;
+      const innerFar=side==='left'?topL-state.w*.070:topR+state.w*.070;
+      const innerNear=side==='left'?botL-state.w*.058:botR+state.w*.058;
       const yFar=table.top+h*.045, yNear=table.bottom-h*.090;
       ctx.fillStyle='rgba(80,44,20,.16)';
       ctx.beginPath(); ctx.moveTo(xFar+sign*8,yFar+8); ctx.lineTo(innerFar+sign*8,yFar+16); ctx.lineTo(innerNear+sign*14,yNear+18); ctx.lineTo(xNear+sign*14,yNear+16); ctx.closePath(); ctx.fill();
@@ -393,7 +393,7 @@
     ctx.restore();
 
     // Inset glass/sand tabletop with a real wooden tray rim around the playable surface.
-    const frameX=state.w*.067, frameTop=state.h*.030, frameBot=state.h*.024;
+    const frameX=state.w*.090, frameTop=state.h*.034, frameBot=state.h*.028;
     const iTopL=topL+frameX*.82, iTopR=topR-frameX*.82, iBotL=botL+frameX, iBotR=botR-frameX, iTop=table.top+frameTop, iBot=table.bottom-frameBot;
     const sand=ctx.createLinearGradient(0,iTop,0,iBot);
     sand.addColorStop(0,'rgba(244,236,190,.76)'); sand.addColorStop(.28,'rgba(253,238,185,.82)'); sand.addColorStop(.68,'rgba(238,203,130,.80)'); sand.addColorStop(1,'rgba(220,177,98,.78)');
@@ -430,7 +430,7 @@
     drawPebble(lerp(iBotL,iBotR,.50),lerp(iTop,iBot,.86),.28,'rgba(132,103,72,.17)');
     ctx.globalAlpha=1;
     // Broad diagonal glass highlights, not grid lines.
-    ctx.globalAlpha=.045; ctx.strokeStyle='rgba(255,255,255,.50)'; ctx.lineWidth=18; ctx.lineCap='round';
+    ctx.globalAlpha=.090; ctx.strokeStyle='rgba(255,255,255,.58)'; ctx.lineWidth=20; ctx.lineCap='round';
     [[.12,.04,.38,.68],[.44,.00,.64,.55],[.62,.24,.86,.92],[.22,.64,.42,.96]].forEach(([a,b,c,d],idx)=>{ ctx.beginPath(); ctx.moveTo(lerp(iTopL,iTopR,a),lerp(iTop,iBot,b)); ctx.bezierCurveTo(lerp(iTopL,iTopR,(a+c)/2),lerp(iTop,iBot,b+.16),lerp(iBotL,iBotR,(a+c)/2+.06),lerp(iTop,iBot,d-.14),lerp(iBotL,iBotR,c),lerp(iTop,iBot,d)); ctx.stroke(); });
     // Original-style aiming guides: one center line and one dashed horizontal threshold.
     ctx.globalAlpha=.32; ctx.strokeStyle='rgba(255,255,255,.80)'; ctx.lineWidth=2.5; ctx.setLineDash([]);
