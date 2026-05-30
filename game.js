@@ -40,12 +40,12 @@
 
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
-    // Locked to the original playable's vertical phone composition.
-    table.top = h*0.305;
-    table.bottom = h*0.865;
-    table.launchY = h*0.775;
-    table.leftBottom = w*.085; table.rightBottom = w*.915;
-    table.leftTop = w*.265; table.rightTop = w*.735;
+    // Wider, shorter tabletop: more like a beach drink table than a long slide lane.
+    table.top = h*0.430;
+    table.bottom = h*0.555;
+    table.launchY = h*0.515;
+    table.leftBottom = w*.070; table.rightBottom = w*.930;
+    table.leftTop = w*.105; table.rightTop = w*.895;
   }
 
   function xBoundsAt(y){
@@ -55,7 +55,7 @@
       r: lerp(table.rightTop, table.rightBottom, t)
     };
   }
-  function scaleAt(y){ return lerp(0.56, 1.12, clamp((y-table.top)/(table.bottom-table.top),0,1)); }
+  function scaleAt(y){ return lerp(0.34, 0.68, clamp((y-table.top)/(table.bottom-table.top),0,1)); }
   function toLaneX(norm,y){ const b=xBoundsAt(y); return lerp(b.l,b.r,(norm+1)/2); }
   function normFromX(x,y){ const b=xBoundsAt(y); return clamp(((x-b.l)/(b.r-b.l))*2-1,-1,1); }
   function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
@@ -283,36 +283,40 @@
     // Soft contact shadow anchors the tray into the beach instead of floating like a UI panel.
     ctx.save();
     ctx.fillStyle='rgba(83,50,23,.22)';
-    ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.bottom+48,(botR-botL)*.70,72,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='rgba(112,75,38,.075)'; ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.top+312,(botR-botL)*.64,270,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.bottom+34,(botR-botL)*.58,42,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(112,75,38,.075)'; ctx.beginPath(); ctx.ellipse((botL+botR)/2,table.top+160,(botR-botL)*.55,130,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
     // Chunky legs tucked under the near rail, partially hidden by the table edge.
     ctx.save();
     ctx.fillStyle='#b5753b';
-    roundRect(botL+70,table.bottom+20,30,h*.105,9,true);
-    roundRect(botR-100,table.bottom+20,30,h*.105,9,true);
+    roundRect(topL+18,table.top+8,18,h*.075,7,true);
+    roundRect(topR-36,table.top+8,18,h*.075,7,true);
+    roundRect(botL+36,table.bottom+8,24,h*.120,8,true);
+    roundRect(botR-60,table.bottom+8,24,h*.120,8,true);
     ctx.fillStyle='rgba(255,226,159,.28)';
-    roundRect(botL+79,table.bottom+28,7,h*.075,4,true);
-    roundRect(botR-91,table.bottom+28,7,h*.075,4,true);
-    ctx.fillStyle='rgba(73,42,20,.22)'; ctx.beginPath(); ctx.ellipse(botL+85,table.bottom+h*.122,34,8,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(botR-86,table.bottom+h*.122,34,8,0,0,Math.PI*2); ctx.fill();
+    roundRect(topL+23,table.top+15,5,h*.048,3,true);
+    roundRect(topR-31,table.top+15,5,h*.048,3,true);
+    roundRect(botL+43,table.bottom+17,6,h*.085,4,true);
+    roundRect(botR-53,table.bottom+17,6,h*.085,4,true);
+    ctx.fillStyle='rgba(73,42,20,.22)'; ctx.beginPath(); ctx.ellipse(botL+48,table.bottom+h*.095,28,7,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(botR-48,table.bottom+h*.095,28,7,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
 
-    // Outer heavy wood slab with bevel/cut corners.
+    // Outer wooden tabletop frame: broad rectangle, thinner rim, slight perspective.
     ctx.beginPath();
-    ctx.moveTo(topL-46,table.top-30); ctx.lineTo(topR+46,table.top-30);
-    ctx.lineTo(botR+48,table.bottom+42); ctx.lineTo(botR+22,table.bottom+70);
-    ctx.lineTo(botL-22,table.bottom+70); ctx.lineTo(botL-48,table.bottom+42);
+    ctx.moveTo(topL-4,table.top-3); ctx.lineTo(topR+4,table.top-3);
+    ctx.lineTo(botR+5,table.bottom+3); ctx.lineTo(botR+3,table.bottom+6);
+    ctx.lineTo(botL-3,table.bottom+6); ctx.lineTo(botL-5,table.bottom+3);
     ctx.closePath();
-    const outer=ctx.createLinearGradient(0,table.top-42,0,table.bottom+76);
+    const outer=ctx.createLinearGradient(0,table.top-10,0,table.bottom+22);
     outer.addColorStop(0,'#ffecbf'); outer.addColorStop(.34,'#f1cc88'); outer.addColorStop(.72,'#d09a59'); outer.addColorStop(1,'#925a2d');
     ctx.save(); ctx.shadowColor='rgba(96,61,29,.22)'; ctx.shadowBlur=18; ctx.shadowOffsetY=8; ctx.fillStyle=outer; ctx.fill(); ctx.restore(); ctx.strokeStyle='rgba(111,72,36,.22)'; ctx.lineWidth=2.8; ctx.stroke();
     ctx.save(); ctx.clip();
     // Natural wood grain: subtle curved strokes and fine highlights, not flat SVG color.
     for(let i=0;i<76;i++){
-      const y=lerp(table.top-22,table.bottom+52,(i*29%100)/100);
+      const y=lerp(table.top-8,table.bottom+18,(i*29%100)/100);
       const b=xBoundsAt(clamp(y,table.top,table.bottom));
       ctx.globalAlpha=.13+(i%6)*.030; ctx.strokeStyle=i%3?'#875b2f':'#fff0bd'; ctx.lineWidth=.9+(i%4)*.65;
-      ctx.beginPath(); ctx.moveTo(b.l-58,y+Math.sin(i*.7)*3); ctx.bezierCurveTo((b.l+b.r)/2-58,y+Math.sin(i*1.3)*14,(b.l+b.r)/2+42,y-Math.cos(i*.9)*12,b.r+58,y+Math.sin(i*.7)*8); ctx.stroke(); if(i%5===0){ ctx.beginPath(); ctx.moveTo(b.l+20+(i*37%(b.r-b.l)),y-2); ctx.quadraticCurveTo(b.l+42+(i*37%(b.r-b.l)),y+5,b.l+72+(i*37%(b.r-b.l)),y-1); ctx.stroke(); }
+      ctx.beginPath(); ctx.moveTo(b.l-34,y+Math.sin(i*.7)*3); ctx.bezierCurveTo((b.l+b.r)/2-42,y+Math.sin(i*1.3)*10,(b.l+b.r)/2+32,y-Math.cos(i*.9)*9,b.r+34,y+Math.sin(i*.7)*6); ctx.stroke(); if(i%5===0){ ctx.beginPath(); ctx.moveTo(b.l+20+(i*37%(b.r-b.l)),y-2); ctx.quadraticCurveTo(b.l+42+(i*37%(b.r-b.l)),y+5,b.l+72+(i*37%(b.r-b.l)),y-1); ctx.stroke(); }
     }
     for(let k=0;k<14;k++){ const y=lerp(table.top,table.bottom+40,(k*23%100)/100), b=xBoundsAt(clamp(y,table.top,table.bottom)); const x=lerp(b.l-40,b.r+40,(k*41%100)/100); ctx.globalAlpha=.16; ctx.strokeStyle='#7a461f'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(x,y,10+(k%3)*4,4+(k%2)*2,.4,0,Math.PI*2); ctx.stroke(); }
     ctx.restore();
@@ -320,8 +324,8 @@
     // Darker side faces make the wooden frame read as a 3D object.
     ctx.save();
     ctx.fillStyle='rgba(111,69,33,.30)';
-    ctx.beginPath(); ctx.moveTo(topL-44,table.top-24); ctx.lineTo(topL-18,table.top-2); ctx.lineTo(botL-22,table.bottom+32); ctx.lineTo(botL-54,table.bottom+32); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(topR+44,table.top-24); ctx.lineTo(topR+18,table.top-2); ctx.lineTo(botR+22,table.bottom+32); ctx.lineTo(botR+54,table.bottom+32); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(topL-18,table.top-8); ctx.lineTo(topL-6,table.top+2); ctx.lineTo(botL-10,table.bottom+13); ctx.lineTo(botL-24,table.bottom+18); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(topR+18,table.top-8); ctx.lineTo(topR+6,table.top+2); ctx.lineTo(botR+10,table.bottom+13); ctx.lineTo(botR+24,table.bottom+18); ctx.closePath(); ctx.fill();
     ctx.restore();
     // Visible lower leg sections below the chunky near rail.
     ctx.save();
@@ -339,8 +343,8 @@
 
     // Inner lighter bevel, separated from the glass inset.
     ctx.beginPath();
-    ctx.moveTo(topL-28,table.top-10); ctx.lineTo(topR+28,table.top-10);
-    ctx.lineTo(botR+46,table.bottom+25); ctx.lineTo(botL-46,table.bottom+25); ctx.closePath();
+    ctx.moveTo(topL-9,table.top-4); ctx.lineTo(topR+9,table.top-4);
+    ctx.lineTo(botR+12,table.bottom+7); ctx.lineTo(botL-12,table.bottom+7); ctx.closePath();
     const bevel=ctx.createLinearGradient(0,table.top,0,table.bottom+18);
     bevel.addColorStop(0,'#fff0c6'); bevel.addColorStop(.52,'#ecc68d'); bevel.addColorStop(1,'#c99661');
     ctx.fillStyle=bevel; ctx.fill(); ctx.strokeStyle='rgba(122,78,37,.18)'; ctx.lineWidth=2; ctx.stroke();
@@ -349,16 +353,16 @@
     ctx.restore();
 
     // Inset glass/sand tabletop with visible margin from the wooden frame.
-    const iTopL=topL+9, iTopR=topR-9, iBotL=botL+16, iBotR=botR-16, iTop=table.top+23, iBot=table.bottom-30;
+    const iTopL=topL+1, iTopR=topR-1, iBotL=botL+2, iBotR=botR-2, iTop=table.top+1, iBot=table.bottom-2;
     const sand=ctx.createLinearGradient(0,iTop,0,iBot);
-    sand.addColorStop(0,'rgba(230,241,217,.44)'); sand.addColorStop(.32,'rgba(255,241,192,.84)'); sand.addColorStop(.72,'rgba(246,222,158,.86)'); sand.addColorStop(1,'rgba(233,199,128,.82)');
+    sand.addColorStop(0,'rgba(255,241,196,.86)'); sand.addColorStop(.32,'rgba(255,230,166,.92)'); sand.addColorStop(.72,'rgba(240,204,132,.90)'); sand.addColorStop(1,'rgba(222,181,104,.86)');
     ctx.beginPath(); ctx.moveTo(iTopL+14,iTop); ctx.lineTo(iTopR-14,iTop); ctx.quadraticCurveTo(iTopR,iTop,iTopR+2,iTop+14); ctx.lineTo(iBotR-2,iBot-16); ctx.quadraticCurveTo(iBotR,iBot,iBotR-16,iBot); ctx.lineTo(iBotL+16,iBot); ctx.quadraticCurveTo(iBotL,iBot,iBotL+2,iBot-16); ctx.lineTo(iTopL-2,iTop+14); ctx.quadraticCurveTo(iTopL,iTop,iTopL+14,iTop); ctx.closePath();
     ctx.fillStyle=sand; ctx.fill();
     ctx.save(); ctx.clip();
     const aoTop=ctx.createLinearGradient(0,iTop,0,iTop+72); aoTop.addColorStop(0,'rgba(58,37,18,.48)'); aoTop.addColorStop(1,'rgba(87,61,32,0)'); ctx.fillStyle=aoTop; ctx.fillRect(0,iTop,state.w,66);
     const aoBot=ctx.createLinearGradient(0,iBot-72,0,iBot); aoBot.addColorStop(0,'rgba(87,61,32,0)'); aoBot.addColorStop(1,'rgba(65,42,20,.34)'); ctx.fillStyle=aoBot; ctx.fillRect(0,iBot-78,state.w,88);
     ctx.restore();
-    ctx.save(); ctx.shadowColor='rgba(91,62,32,.66)'; ctx.shadowBlur=22; ctx.shadowOffsetY=6; ctx.strokeStyle='rgba(70,44,22,.42)'; ctx.lineWidth=21; ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.shadowColor='rgba(91,62,32,.38)'; ctx.shadowBlur=10; ctx.shadowOffsetY=3; ctx.strokeStyle='rgba(70,44,22,.20)'; ctx.lineWidth=5; ctx.stroke(); ctx.restore();
     ctx.strokeStyle='rgba(91,134,128,.10)'; ctx.lineWidth=2.5; ctx.stroke();
     ctx.save(); ctx.clip();
     // Cloudy sand and small grain noise.
@@ -366,12 +370,15 @@
     ctx.globalAlpha=.26; ctx.fillStyle='#fff0b8'; for(let i=0;i<16;i++){ const y=lerp(iTop+24,iBot-26,i/8), t=(y-iTop)/(iBot-iTop), l=lerp(iTopL,iBotL,t), r=lerp(iTopR,iBotR,t); ctx.beginPath(); ctx.ellipse((l+r)/2+Math.sin(i*1.7)*18,y,(r-l)*(.26+.04*Math.sin(i)),16,.08,0,Math.PI*2); ctx.fill(); }
     ctx.globalAlpha=1;
     // Beach details stay decorative, not blocking the main sliding lane.
-    ctx.globalAlpha=.76;
-    drawShell(lerp(iTopL,iTopR,.18),lerp(iTop,iBot,.30),.50,-.45);
-    drawShell(lerp(iTopL,iTopR,.78),lerp(iTop,iBot,.46),.46,.55);
-    drawShell(lerp(iBotL,iBotR,.16),lerp(iTop,iBot,.78),.50,.7);
-    drawStarfish(lerp(iBotL,iBotR,.58),lerp(iTop,iBot,.67),.54,.25);
-    drawStarfish(lerp(iTopL,iTopR,.83),lerp(iTop,iBot,.22),.40,.35);
+    ctx.globalAlpha=.92;
+    drawShell(lerp(iTopL,iTopR,.14),lerp(iTop,iBot,.22),.78,-.45);
+    drawShell(lerp(iTopL,iTopR,.76),lerp(iTop,iBot,.38),.72,.55);
+    drawShell(lerp(iBotL,iBotR,.18),lerp(iTop,iBot,.76),.74,.7);
+    drawShell(lerp(iTopL,iTopR,.50),lerp(iTop,iBot,.18),.58,-.15);
+    drawShell(lerp(iTopL,iTopR,.34),lerp(iTop,iBot,.48),.46,.35);
+    drawStarfish(lerp(iBotL,iBotR,.58),lerp(iTop,iBot,.67),.74,.25);
+    drawStarfish(lerp(iTopL,iTopR,.84),lerp(iTop,iBot,.22),.62,.35);
+    drawStarfish(lerp(iTopL,iTopR,.70),lerp(iTop,iBot,.78),.48,-.25);
     drawPebble(lerp(iTopL,iTopR,.68),lerp(iTop,iBot,.34),.30,'rgba(96,91,86,.22)');
     drawPebble(lerp(iBotL,iBotR,.35),lerp(iTop,iBot,.55),.26,'rgba(116,92,70,.18)');
     drawPebble(lerp(iBotL,iBotR,.74),lerp(iTop,iBot,.74),.28,'rgba(132,103,72,.18)');
@@ -382,13 +389,13 @@
     drawPebble(lerp(iBotL,iBotR,.50),lerp(iTop,iBot,.86),.28,'rgba(132,103,72,.17)');
     ctx.globalAlpha=1;
     // Broad diagonal glass highlights, not grid lines.
-    ctx.globalAlpha=.13; ctx.strokeStyle='rgba(255,255,255,.66)'; ctx.lineWidth=26; ctx.lineCap='round';
+    ctx.globalAlpha=.045; ctx.strokeStyle='rgba(255,255,255,.50)'; ctx.lineWidth=18; ctx.lineCap='round';
     [[.12,.04,.38,.68],[.44,.00,.64,.55],[.62,.24,.86,.92],[.22,.64,.42,.96]].forEach(([a,b,c,d],idx)=>{ ctx.beginPath(); ctx.moveTo(lerp(iTopL,iTopR,a),lerp(iTop,iBot,b)); ctx.bezierCurveTo(lerp(iTopL,iTopR,(a+c)/2),lerp(iTop,iBot,b+.16),lerp(iBotL,iBotR,(a+c)/2+.06),lerp(iTop,iBot,d-.14),lerp(iBotL,iBotR,c),lerp(iTop,iBot,d)); ctx.stroke(); });
     // Original-style aiming guides: one center line and one dashed horizontal threshold.
-    ctx.globalAlpha=.82; ctx.strokeStyle='rgba(255,255,255,.92)'; ctx.lineWidth=4; ctx.setLineDash([]);
+    ctx.globalAlpha=.32; ctx.strokeStyle='rgba(255,255,255,.80)'; ctx.lineWidth=2.5; ctx.setLineDash([]);
     ctx.beginPath(); ctx.moveTo((iTopL+iTopR)/2,iTop+8); ctx.lineTo((iBotL+iBotR)/2,iBot-24); ctx.stroke();
     const dashY=lerp(iTop,iBot,.74), db={l:lerp(iTopL,iBotL,.74), r:lerp(iTopR,iBotR,.74)};
-    ctx.setLineDash([12,12]); ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(db.l+8,dashY); ctx.lineTo(db.r-8,dashY); ctx.stroke(); ctx.setLineDash([]);
+    ctx.setLineDash([10,12]); ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(db.l+8,dashY); ctx.lineTo(db.r-8,dashY); ctx.stroke(); ctx.setLineDash([]);
     ctx.restore();
     // Glass thickness rim / clear collision boundary.
     ctx.beginPath(); ctx.moveTo(iTopL+3,iTop+3); ctx.lineTo(iTopR-3,iTop+3); ctx.lineTo(iBotR-5,iBot-5); ctx.lineTo(iBotL+5,iBot-5); ctx.closePath();
@@ -397,17 +404,26 @@
     ctx.beginPath(); ctx.moveTo(iTopL,iTop); ctx.lineTo(iTopR,iTop); ctx.lineTo(iBotR,iBot); ctx.lineTo(iBotL,iBot); ctx.closePath();
     ctx.strokeStyle='rgba(230,255,247,.11)'; ctx.lineWidth=.9; ctx.stroke();
 
-    // Thick near front rail overlaps the tray lip, giving the table real weight.
+    // Front rail and support planks give it the structure of a real seaside table.
     ctx.save();
-    const rail=ctx.createLinearGradient(0,table.bottom-10,0,table.bottom+54);
+    const rail=ctx.createLinearGradient(0,table.bottom-5,0,table.bottom+20);
     rail.addColorStop(0,'rgba(255,224,171,.94)'); rail.addColorStop(.50,'rgba(216,154,88,.90)'); rail.addColorStop(1,'rgba(135,84,40,.88)');
     ctx.fillStyle=rail; ctx.strokeStyle='rgba(104,67,34,.34)'; ctx.lineWidth=2.4;
     ctx.beginPath();
-    ctx.moveTo(botL-16,table.bottom-8); ctx.lineTo(botR+16,table.bottom-8);
-    ctx.lineTo(botR+42,table.bottom+52); ctx.lineTo(botL-42,table.bottom+52); ctx.closePath();
+    ctx.moveTo(botL-5,table.bottom-3); ctx.lineTo(botR+5,table.bottom-3);
+    ctx.lineTo(botR+10,table.bottom+14); ctx.lineTo(botL-10,table.bottom+14); ctx.closePath();
     ctx.fill(); ctx.stroke();
     ctx.globalAlpha=.24; ctx.strokeStyle='#ffe7b0'; ctx.lineWidth=3;
     ctx.beginPath(); ctx.moveTo(botL-4,table.bottom+4); ctx.lineTo(botR+4,table.bottom+4); ctx.stroke();
+    ctx.globalAlpha=.55; ctx.strokeStyle='rgba(95,54,24,.60)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(botL+42,table.bottom+8); ctx.lineTo(botL+96,table.bottom+38); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(botR-42,table.bottom+8); ctx.lineTo(botR-96,table.bottom+38); ctx.stroke();
+    ctx.globalAlpha=1; ctx.fillStyle='rgba(126,76,34,.88)';
+    roundRect(botL+34,table.bottom+10,20,72,7,true);
+    roundRect(botR-54,table.bottom+10,20,72,7,true);
+    ctx.fillStyle='rgba(255,220,150,.24)';
+    roundRect(botL+40,table.bottom+18,5,48,3,true);
+    roundRect(botR-48,table.bottom+18,5,48,3,true);
     ctx.restore();
   }
   function drawHUD(){
@@ -451,7 +467,7 @@
     text('Tasty Travels',w*.17,h*.982,13,'#fff','center','bold','#185c5f');
   }
   function drawItem(it){
-    if(it.aim){ ctx.save(); ctx.translate(it.x,it.y); ctx.rotate(it.norm*.30); ctx.strokeStyle='rgba(255,255,255,.98)'; ctx.lineWidth=5; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,-it.radius*.95); ctx.lineTo(0,-Math.max(150,state.h*.25)); ctx.stroke(); ctx.restore(); }
+    if(it.aim){ ctx.save(); ctx.translate(it.x,it.y); ctx.rotate(it.norm*.24); ctx.globalAlpha=.22; ctx.strokeStyle='rgba(255,255,255,.75)'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,-it.radius*.80); ctx.lineTo(0,-Math.max(56,state.h*.085)); ctx.stroke(); ctx.restore(); }
     ctx.save(); ctx.globalAlpha=.38; ctx.fillStyle='rgba(49,35,20,.68)'; ctx.beginPath(); ctx.ellipse(it.x+3,it.y+it.radius*.60,it.radius*.62,it.radius*.20,0,0,Math.PI*2); ctx.fill(); ctx.restore();
     drawDrinkIcon(it.lvl,it.x,it.y,(it.radius/24.7)*(1+it.pop*.10),0);
   }
