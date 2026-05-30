@@ -40,12 +40,12 @@
 
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
-    // Seaside-tray camera: tabletop stays dominant, while sky/ocean/sand remain clearly visible.
-    table.top = h*0.350;
-    table.bottom = h*0.820;
-    table.launchY = h*0.745;
-    table.leftBottom = w*.135; table.rightBottom = w*.865;
-    table.leftTop = w*.190; table.rightTop = w*.810;
+    // Original-style beach-table camera: dominant near rail, narrower far edge, clear seaside backdrop.
+    table.top = h*0.335;
+    table.bottom = h*0.845;
+    table.launchY = h*0.755;
+    table.leftBottom = w*.060; table.rightBottom = w*.940;
+    table.leftTop = w*.155; table.rightTop = w*.845;
   }
 
   function xBoundsAt(y){
