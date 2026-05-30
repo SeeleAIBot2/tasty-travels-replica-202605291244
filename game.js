@@ -40,12 +40,12 @@
 
   function layoutTable(){
     const w=state.w,h=state.h, p=state.portrait;
-    // Gameplay-first camera: the tabletop fills the screen instead of receding into the beach.
-    table.top = h*0.285;
-    table.bottom = h*0.835;
-    table.launchY = h*0.750;
-    table.leftBottom = w*.000; table.rightBottom = w*1.000;
-    table.leftTop = w*.020; table.rightTop = w*.980;
+    // Seaside-tray camera: tabletop stays dominant, while sky/ocean/sand remain clearly visible.
+    table.top = h*0.350;
+    table.bottom = h*0.820;
+    table.launchY = h*0.745;
+    table.leftBottom = w*.135; table.rightBottom = w*.865;
+    table.leftTop = w*.190; table.rightTop = w*.810;
   }
 
   function xBoundsAt(y){
@@ -347,8 +347,9 @@
     for(let k=0;k<4;k++){ ctx.beginPath(); ctx.moveTo(lerp(topL,topR,k/3)-28,table.top-14); ctx.lineTo(lerp(botL,botR,k/3)-48+k*22,table.bottom+42); ctx.stroke(); }
     ctx.restore();
 
-    // Inset glass/sand tabletop with visible margin from the wooden frame.
-    const iTopL=topL+2, iTopR=topR-2, iBotL=botL+3, iBotR=botR-3, iTop=table.top+3, iBot=table.bottom-5;
+    // Inset glass/sand tabletop with a real wooden tray rim around the playable surface.
+    const frameX=state.w*.052, frameTop=state.h*.028, frameBot=state.h*.022;
+    const iTopL=topL+frameX*.82, iTopR=topR-frameX*.82, iBotL=botL+frameX, iBotR=botR-frameX, iTop=table.top+frameTop, iBot=table.bottom-frameBot;
     const sand=ctx.createLinearGradient(0,iTop,0,iBot);
     sand.addColorStop(0,'rgba(255,241,196,.86)'); sand.addColorStop(.32,'rgba(255,230,166,.92)'); sand.addColorStop(.72,'rgba(240,204,132,.90)'); sand.addColorStop(1,'rgba(222,181,104,.86)');
     ctx.beginPath(); ctx.moveTo(iTopL+5,iTop); ctx.lineTo(iTopR-5,iTop); ctx.quadraticCurveTo(iTopR,iTop,iTopR+1,iTop+5); ctx.lineTo(iBotR-1,iBot-7); ctx.quadraticCurveTo(iBotR,iBot,iBotR-7,iBot); ctx.lineTo(iBotL+7,iBot); ctx.quadraticCurveTo(iBotL,iBot,iBotL+1,iBot-7); ctx.lineTo(iTopL-1,iTop+5); ctx.quadraticCurveTo(iTopL,iTop,iTopL+5,iTop); ctx.closePath();
